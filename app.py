@@ -1,0 +1,37 @@
+from flask import Flask, render_template
+from flask import request,url_for
+import sys
+sys.path.append("..")
+from system.chat import Chat
+import os
+app = Flask(__name__)
+@app.context_processor
+def override_url_for():
+    return dict(url_for=dated_url_for)
+
+def dated_url_for(endpoint, **values):
+    if endpoint == 'static':
+        filename = values.get('filename', None)
+        if filename:
+            file_path = os.path.join(app.root_path, endpoint, filename)
+            values['q'] = int(os.stat(file_path).st_mtime)
+    return url_for(endpoint, **values)
+
+@app.route('/')
+def chat():
+    chat=Chat()
+    log=chat.start()
+    return render_template("chat.html",chat_text=log)
+
+@app.route('/', methods = ['POST'])
+def start_chat():
+    chat=Chat()
+    log=chat.start()
+    input=request.form.get("send")
+    if input!=None:
+        log=chat.run(input)
+    return render_template("chat.html",chat_text=log)
+    
+
+if __name__ == '__main__':
+    app.run(debug=True)
