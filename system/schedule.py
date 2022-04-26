@@ -1,4 +1,3 @@
-from calendar import weekday
 import MeCab
 import unicodedata
 from datetime import  datetime
@@ -23,7 +22,7 @@ class Discrimination(Schedule_Table):
         self.minute = int(now_date.minute)
 
     #形態素解析
-    def d_morpheme(self,input,speech=False):
+    def morpheme(self,input,speech=False):
         input=unicodedata.normalize('NFKC', input)
         if speech:
             speech_list = []
@@ -52,7 +51,7 @@ class Discrimination(Schedule_Table):
                 out_list.append(input_list[i])
             elif out_list != [] and speech_list[i-1] == "名詞" and speech_list[i+1] == "名詞":
                 out_list.append(input_list[i])
-            elif speech_list[i] == "名詞" and (input=="こと" or input=="予定"):
+            elif speech_list[i] == "名詞" and (input!="こと" or input!="予定"):
                 out_list.append(input)
             else:
                 continue
@@ -61,40 +60,29 @@ class Discrimination(Schedule_Table):
     #文章内の日程の取り出し
     def date_specify(self,date_kind,input_list):
         data=[input_list[i-1] for i,x in enumerate(input_list) if x == date_kind and input_list[i-1].isdecimal()]
-        return data[0]
+        if data==[]:
+            return data
+        else:
+            return int(data[0])
     
     #予定の登録
     def schedule_register(self,input):
         input = self.date_update.convert(input)
-        input_list,speech_list = self.d_morpheme(input,speech=True)
+        input_list,speech_list = self.morpheme(input,speech=True)
         plan_contents = self.content_extract(input_list,speech_list)
-        if "日" in input_list and "月" in input_list and "時" in input_list:
-            plan_day = int(self.date_specify("日",input_list))
-            plan_month = int(self.date_specify("月",input_list))
-            plan_hour = int(self.date_specify("時",input_list))
-            if "分" in input_list:
-                plan_minute = int(self.date_specify("分",input_list))
-            else:
-                plan_minute = 0
-        elif "日" in input_list and "月" not in input_list and "時" in input_list:
-            plan_day = int(self.date_specify("日",input_list))
+        plan_day = self.date_specify("日",input_list)
+        plan_month = self.date_specify("月",input_list)
+        plan_hour = self.date_specify("時",input_list)
+        plan_hour = self.date_specify("時",input_list)
+        plan_minute = self.date_specify("分",input_list)
+        if plan_month == []:
             plan_month = self.month
-            plan_hour = int(self.date_specify("時",input_list))
-            if "分" in input_list:
-                plan_minute = int(self.date_specify("分",input_list))
-            else:
-                plan_minute = 0
-        elif "日" in input_list and "月" not in input_list:
-            plan_day = int(self.date_specify("日",input_list))
-            plan_month = self.month
+        elif plan_hour == []:
             plan_hour = None
             plan_minute = None
-        elif "日" in input_list and "月" in input_list:
-            plan_day = int(self.date_specify("日",input_list))
-            plan_month = int(self.date_specify("月",input_list))
-            plan_hour = None
-            plan_minute = None
-        else:
+        elif plan_hour == []:
+            plan_minute = 0
+        elif plan_day == []:
             return 0
         plan_data = [self.year,plan_month,plan_day,plan_hour,plan_minute,plan_contents]
         self.schedule_date = self.update_table(plan_data)
@@ -103,20 +91,20 @@ class Discrimination(Schedule_Table):
     #予定の受け渡し
     def scedule_teach(self,input):
         input = self.date_update.convert(input)
-        input_list = self.d_morpheme(input,speech=False)
+        input_list = self.morpheme(input,speech=False)
         teach_year = self.year
         teach_day = None
         data = self.schedule_date
         if "月" in input_list and "日" not in input_list:
-            teach_month = int(self.date_specify("月",input_list))
+            teach_month = self.date_specify("月",input_list)
             teach_data = data[(data["月"] == teach_month) & (data["年"] == teach_year)]
             return teach_month,teach_day,teach_data
         elif "日" in input_list and "月" not in input_list:
-            teach_day = int(self.date_specify("日",input_list))
+            teach_day = self.date_specify("日",input_list)
             teach_month = self.month
         elif "日" in input_list and "月" in input_list:
-            teach_month = int(self.date_specify("月",input_list))
-            teach_day = int(self.date_specify("日",input_list))
+            teach_month = self.date_specify("月",input_list)
+            teach_day = self.date_specify("日",input_list)
         teach_data = data[(data["月"] == teach_month) & (data["日"] == teach_day) & (data["年"] == teach_year)]
         return teach_month,teach_day,teach_data
     
@@ -127,34 +115,35 @@ class Discrimination(Schedule_Table):
     #特定のレコード取り出し   
     def scedule_get(self,input):
         input = self.date_update.convert(input)
-        input_list = self.d_morpheme(input)
-        month = self.month
-        day = self.day
+        input_list = self.morpheme(input)
+        day=self.date_specify("日",input_list)
+        month=self.date_specify("月",input_list)
         plan = None
-        for ipt in input_list:
-            if ipt in self.schedule_date["月"]:
-               month = ipt
-            if ipt in self.schedule_date["予定"]:
-                plan = ipt
+        #if day==[] or month==[]:
+            #return 0
+        plan_table = self.schedule_date[(self.schedule_date["月"]==month) & (self.schedule_date["日"]==day)]
+        for p in plan_table["予定"]:
+            if p in input:
+                plan = p
         record = self.schedule_date[(self.schedule_date["月"] == month) & (self.schedule_date["日"] == day) & (self.schedule_date["予定"] == plan)]
         return record
     
-
+    #曜日を教えてくれる
     def teach_week(self,input):
         year = None
         month = None
         day = None
         input = self.date_update.convert(input)
-        input_list = self.d_morpheme(input)
+        input_list = self.morpheme(input)
         if "年" in input_list:
-            year = int(self.date_specify("年",input_list))
+            year = self.date_specify("年",input_list)
         else:
             year = self.year
         if "月" in input_list:
-            month = int(self.date_specify("月",input_list))
+            month = self.date_specify("月",input_list)
         else:
             month = self.month
-        day = int(self.date_specify("日",input_list))
+        day = self.date_specify("日",input_list)
         d_key = dt.date(year,month,day)
         week_key = d_key.weekday()
         return year,month,day,self.week_list[week_key]

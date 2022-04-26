@@ -5,6 +5,7 @@ class Chat:
     def __init__(self):
         self.tmplate=Template()
     
+    #チャットの初期設定
     def start(self):
         log_list=self.tmplate.log_load()
         tmp_out=self.tmplate.start_chat()
@@ -14,6 +15,7 @@ class Chat:
         return log_list
     
     
+    #実装
     def run(self,input):
         log_list=self.tmplate.log_load()    
         decorder=Decorder(input)

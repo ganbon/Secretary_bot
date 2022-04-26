@@ -14,4 +14,3 @@ def scraping(url, file_path):
         f.write(text)
 
 
-# scraping('https://www3.nhk.or.jp/news/html/20220421/k10013592581000.html','b.txt')

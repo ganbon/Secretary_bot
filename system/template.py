@@ -5,7 +5,7 @@ from system.schedule_data import Schedule_Table
 
 class Template(Schedule_Table):
     def __init__(self):
-        super().__init__(csv_file_path="csv_csv_data/schedule_2022.csv")
+        super().__init__(csv_file_path="csv_data/schedule_2022.csv")
         self.log = None
         now_date = datetime.now()
         self.year = int(now_date.year)
@@ -44,7 +44,9 @@ class Template(Schedule_Table):
             else:
                 out = "こんばんは。"
             out += "今日は"+str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日"+self.week+"です。\n今日の予定は"
+            print(self.schedule_csv_data)
             teach_csv_data = self.schedule_csv_data[(self.schedule_csv_data["月"] == self.month) & (self.schedule_csv_data["日"] == self.day) & (self.schedule_csv_data["年"] == self.year)]
+            print(teach_csv_data)
             if teach_csv_data.empty:
                 out += "特にありません。"
             else:
