@@ -1,12 +1,14 @@
 #your_container{
-  /* 高さや幅など、好きな様に設定
-  bms_messages_containerの方で、縦横いっぱいに広がってくれるので、
-  ここで充てた高さと横幅がそのままスタイルになる仕組み */
-
-  height:480px;/*ここはご自由に*/
-  width: 100%;/*ここはご自由に*/
+  height: 100%;
+  width: 100%;
 }
-
+body {
+  height: 100%;
+  margin: 0;
+}
+html {
+  height: 100%;
+}
 /* ヘッダー部分② */
 #bms_chat_header {
   padding: 6px;/*隙間調整*/
@@ -38,9 +40,7 @@
     max-width: 100%;/*文字が長くなった時に吹き出しがタイムラインからはみ出さない様にする*/
     font-size: 16px;
 }
-    /*
-    *追加
-    */
+
     .bms_message_content{
         padding: 20px;/*文字や画像（コンテンツ）の外側に隙間を入れる*/
     }
@@ -50,9 +50,7 @@
     float: left;/*吹き出しをbms_messagesに対して左寄せ*/
     line-height: 1.3em;
 }
-    /*
-    *追加
-    */
+
     .bms_left .bms_message_box {
         color: #333;/*テキストを黒にする*/
         background: #fff;
@@ -66,9 +64,7 @@
     float: right;/*吹き出しをbms_messagesに対して右寄せ*/
     line-height: 1.3em;
 }
-    /*
-    *追加
-    */
+
     .bms_right .bms_message_box {
         color: #fff;/*テキストを白にする*/
         background: #71138ed7;
