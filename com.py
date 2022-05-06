@@ -3,7 +3,7 @@ import webbrowser
 import threading
 import psutil
 import os
-class Comand:
+class Command:
     def __init__(self):
         self.pid=[]
     def set_up(self):   
@@ -20,7 +20,6 @@ class Comand:
 
     def quit(self):
         cwd=os.getcwd()
-        print(cwd)
         for proc in psutil.process_iter():
             if 'python.exe'  in str(proc.exe) and cwd+'\\app.py' in proc.cmdline():
                 self.pid.append(proc.pid)
