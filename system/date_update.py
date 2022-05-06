@@ -34,6 +34,9 @@ class Date_Update:
         if "今月" in sentences:
             year,month = self.year,self.month
             sentences = sentences.replace("今月",str(year)+"年"+str(month)+"月")
+        if "来年" in sentences:
+            yaer=self.year+1
+            sentences = sentences.replace("来年",str(year)) 
         for w in self.week_list:
             if w in sentences:
                 self.key_week = self.week_list.index(w)
@@ -77,7 +80,7 @@ class Date_Update:
             day += diff_num-31
         elif month in self.special_month and day + diff_num > 30:
             month = month+1
-            day += diff_num-31
+            day += diff_num-30
         else:
             day += diff_num
         self.year = year
