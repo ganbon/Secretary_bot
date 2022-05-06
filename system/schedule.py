@@ -4,7 +4,8 @@ from datetime import  datetime
 from system.date_update import Date_Update
 from system.schedule_data import Schedule_Table
 import datetime as dt
-
+import math
+import random
 
 class Discrimination(Schedule_Table):
     def __init__(self,csv_file_path):
@@ -17,6 +18,7 @@ class Discrimination(Schedule_Table):
         self.month = int(now_date.month)
         self.day = int(now_date.day)
         self.week_list = ["月曜日","火曜日","水曜日","木曜日","金曜日","土曜日","日曜日"]
+        self.date_key = ["年","月","日","時","分"]
         self.week = self.week_list[datetime.today().weekday()]
         self.hour = int(now_date.hour)
         self.minute = int(now_date.minute)
@@ -40,18 +42,17 @@ class Discrimination(Schedule_Table):
     #予定の内容抽出
     def content_extract(self,input_list,speech_list):
         out_list = []
+        ban_word=["覚え","記憶","予定"]
         for i,input in enumerate(input_list):
-            if input == "覚え" or input == "記憶":
+            if input in ban_word:
                 break
-            elif input.isdecimal():
+            elif input.isdecimal() and input_list[i+1] in self.date_key:
                 continue
-            elif (input_list[i-1]).isdecimal() and (input == "年",input == "月" or input == "日" or input == "時" or input == "分"):
+            elif (input_list[i-1]).isdecimal() and input in self.date_key:
                 continue
-            elif out_list == [] and speech_list[i-1] == "助詞" and speech_list[i] == "名詞":
+            elif out_list != [] and speech_list[i-1] == "名詞" and speech_list[i+1] == "名詞" and input_list[i+1] not in ban_word:
                 out_list.append(input_list[i])
-            elif out_list != [] and speech_list[i-1] == "名詞" and speech_list[i+1] == "名詞":
-                out_list.append(input_list[i])
-            elif speech_list[i] == "名詞" and (input!="こと" or input!="予定"):
+            elif speech_list[i] == "名詞":
                 out_list.append(input)
             else:
                 continue
@@ -67,6 +68,11 @@ class Discrimination(Schedule_Table):
     
     #予定の登録
     def schedule_register(self,input):
+        schedule_list=self.schedule_date.values.tolist()
+        for i,s_list in enumerate(schedule_list):
+            for j,s in enumerate(s_list[:5]):
+                if math.isnan(s):
+                    schedule_list[i][j]=None
         input = self.date_update.convert(input)
         input_list,speech_list = self.morpheme(input,speech=True)
         plan_contents = self.content_extract(input_list,speech_list)
@@ -80,16 +86,18 @@ class Discrimination(Schedule_Table):
         elif plan_hour == []:
             plan_hour = None
             plan_minute = None
-        elif plan_hour == []:
+        elif plan_hour != []:
             plan_minute = 0
         elif plan_day == []:
             return 0
         plan_data = [self.year,plan_month,plan_day,plan_hour,plan_minute,plan_contents]
+        if plan_data in schedule_list:
+            return -1
         self.schedule_date = self.update_table(plan_data)
         return plan_data
     
     #予定の受け渡し
-    def scedule_teach(self,input):
+    def schedule_teach(self,input):
         input = self.date_update.convert(input)
         input_list = self.morpheme(input,speech=False)
         teach_year = self.year
@@ -113,7 +121,7 @@ class Discrimination(Schedule_Table):
         return super().delete_record(del_record)
     
     #特定のレコード取り出し   
-    def scedule_get(self,input):
+    def schedule_get(self,input):
         input = self.date_update.convert(input)
         input_list = self.morpheme(input)
         day=self.date_specify("日",input_list)
@@ -127,9 +135,9 @@ class Discrimination(Schedule_Table):
                 plan = p
         record = self.schedule_date[(self.schedule_date["月"] == month) & (self.schedule_date["日"] == day) & (self.schedule_date["予定"] == plan)]
         return record
-    
+
     #曜日を教えてくれる
-    def teach_week(self,input):
+    def week_teach(self,input):
         year = None
         month = None
         day = None
@@ -148,4 +156,10 @@ class Discrimination(Schedule_Table):
         week_key = d_key.weekday()
         return year,month,day,self.week_list[week_key]
         
-        
+    #豆知識をランダムにわたす  
+    def knowledge_teach(self):
+        file_path="text_data/min_kl.txt"
+        with open(file_path,'r',encoding='UTF-8') as f:
+            knowledge_data = f.readlines()
+        knowledge = random.choice(knowledge_data)
+        return knowledge 

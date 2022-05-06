@@ -5,6 +5,7 @@ from system.schedule import Discrimination
 from system.summany import generate_text_from_model
 import os
 from system.text_get import scraping
+from system.emotion import generate
 class Decorder(Discrimination):
     def __init__(self,input,csv_file_path="csv_data/schedule_2022.csv"):
         super().__init__(csv_file_path)
@@ -14,13 +15,15 @@ class Decorder(Discrimination):
                 
     #処理決定のための関数
     def decision(self):
-        sentences=self.morpheme()
+        sentences=self.morpheme(self.input)
         #覚えておいてほしい予定を覚えててくれる
         if "記憶" in sentences or "覚え" in sentences:
             plan_data = self.schedule_register(self.input)
             if plan_data == 0:
                 out="すみません。正確な日時を教えてくれませんか？"
                 return out
+            elif plan_data == -1:
+                out="その予定はすでに登録されています。"
             else:
                 if plan_data[3] == None:
                     out=str(plan_data[0])+"年"+str(plan_data[1])+"月"+str(plan_data[2])+"日に"+plan_data[5]+"ですね。覚えておきます。"
@@ -29,7 +32,7 @@ class Decorder(Discrimination):
                     
         #指定した日程の予定を教えてくれる
         elif "予定" in sentences and ("教え" in sentences or "?" in sentences):
-            month,day,plan_data,=self.scedule_teach(self.input)
+            month,day,plan_data=self.schedule_teach(self.input)
             if plan_data.empty:
                 out = "予定は特にありません。"
             else:
@@ -45,16 +48,14 @@ class Decorder(Discrimination):
         
         #予定のキャンセル
         elif ("削除" in sentences or "消し" in sentences) and "予定" in sentences:
-            record=self.scedule_get(self.input)
+            record=self.schedule_get(self.input)
             #if (record==0).all():
                 #out = "うまく処理ができませんでした。正確な日にちを入力してください"
             if record.empty:
                 out = "該当する予定が見つかりませんでした"
-            elif len(record) > 1:
-                out = "予定が複数見つかりました"
             else:
                 self.delete_record(record)
-                out="予定を取り消しました"
+                out = "予定を取り消しました"
         
         #urlの内容を抽出して要約
         elif "抽出" in sentences and "https" in sentences and "要約" in sentences:
@@ -89,15 +90,21 @@ class Decorder(Discrimination):
         
         #曜日の確認
         elif "何曜日" in self.input:
-            year,month,day,week=self.teach_week(self.input)
+            year,month,day,week=self.week_teach(self.input)
             if year == None:
                 out = "いつの話ですか？"
             else:   
                 out=str(year)+"年"+str(month)+"月"+str(day)+"日は"+week+"です。"
+        
+        #豆知識教えてくれる
+        elif "豆知識" in self.input and "教え" in self.input:
+            knowledge = self.knowledge_teach()
+            out = knowledge.replace('\n','')
+        #該当しない入力の場合のときその言葉に対して感情表現をする（ないよりはマシかと…）
         else:
-            out = "はい"
+            out = generate(self.input)
         return out
 
-            
+        
                 
             
