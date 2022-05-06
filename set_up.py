@@ -1,8 +1,8 @@
 import tkinter as tk
 import sys
-from com import Comand
+from com import Command
 
-com=Comand()
+com=Command()
 root=tk.Tk()
 root.title("秘書チャット")
 root.geometry("280x240")
@@ -12,8 +12,7 @@ quit_button=tk.Button(root,text="サーバ停止",width=30,command=com.quit_butt
 quit_button.pack()
 app_button=tk.Button(root,text="アプリ起動",width=30,command=com.set_up)
 app_button.pack()
-help_button=tk.Button(root,text="ヘルプ",width=30)
-help_button.pack()
+
 
 root.mainloop()
 
