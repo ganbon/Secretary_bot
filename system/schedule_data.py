@@ -22,7 +22,7 @@ class Schedule_Table:
         return self.df
 
     def delete_record(self,del_record):
-        self.df.drop(del_record.index,inplace=True)
+        self.df.drop(del_record.index,inplace = True)
         self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
 
 

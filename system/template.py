@@ -18,13 +18,13 @@ class Template(Schedule_Table):
         self.schedule_csv_data = self.create_table()
         
     def log_load(self):
-        with open("csv_data/chat_log.csv",mode="r",encoding="utf8") as input_f:
+        with open("csv_data/chat_log.csv",mode = "r",encoding = "utf8") as input_f:
             log = csv.reader(input_f)
             self.log_list = [o for o in log]
         return self.log_list
             
     def log_save(self):
-        with open("csv_data/chat_log.csv",mode="w",encoding="utf8",newline="") as input_f:
+        with open("csv_data/chat_log.csv",mode = "w",encoding = "utf8",newline = "") as input_f:
             write = csv.writer(input_f)
             write.writerows(self.log_list) 
 

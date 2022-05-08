@@ -9,7 +9,7 @@ def scraping(url, file_path):
     text_list = list(set(text_list))
     text_list = [text.replace('\u3000', '') for text in text_list]
     text = '\n'.join(text_list)
-    with open(file_path, 'w', encoding='utf_8') as f:
+    with open(file_path, 'w', encoding = 'utf_8') as f:
         f.write(text)
 
 

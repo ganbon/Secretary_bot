@@ -1,7 +1,7 @@
 
 from transformers import T5Tokenizer,T5ForConditionalGeneration
 def generate_text_from_model(text_file,max_length_src = 700,max_length_target = 70,num_return_sequences = 1):
-    model_path = 'model'
+    model_path = 'model_summany'
     tokenizer = T5Tokenizer.from_pretrained(model_path)
     with open(text_file,'r',encoding='UTF-8') as f:
         text = f.read()

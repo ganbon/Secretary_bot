@@ -33,16 +33,16 @@ class Discrimination(Schedule_Table):
             while node:
                 if node.feature.split(",")[0] != "BOS/EOS":
                     speech_list.append(node.feature.split(",")[0])    
-                node=node.next
+                node = node.next
             return sentence,speech_list
         else:
-            sentence=self.wakati.parse(input).split()
+            sentence = self.wakati.parse(input).split()
             return sentence   
         
     #予定の内容抽出
     def content_extract(self,input_list,speech_list):
         out_list = []
-        ban_word=["覚え","記憶","予定"]
+        ban_word = ["覚え","記憶","予定"]
         for i,input in enumerate(input_list):
             if input in ban_word:
                 break
@@ -60,15 +60,15 @@ class Discrimination(Schedule_Table):
         
     #文章内の日程の取り出し
     def date_specify(self,date_kind,input_list):
-        data=[input_list[i-1] for i,x in enumerate(input_list) if x == date_kind and input_list[i-1].isdecimal()]
-        if data==[]:
+        data = [input_list[i-1] for i,x in enumerate(input_list) if x == date_kind and input_list[i-1].isdecimal()]
+        if data == []:
             return data
         else:
             return int(data[0])
     
     #予定の登録
     def schedule_register(self,input):
-        schedule_list=self.schedule_date.values.tolist()
+        schedule_list = self.schedule_date.values.tolist()
         for i,s_list in enumerate(schedule_list):
             for j,s in enumerate(s_list[:5]):
                 if math.isnan(s):
@@ -158,7 +158,7 @@ class Discrimination(Schedule_Table):
         
     #豆知識をランダムにわたす  
     def knowledge_teach(self):
-        file_path="text_data/min_kl.txt"
+        file_path = "text_data/min_kl.txt"
         with open(file_path,'r',encoding='UTF-8') as f:
             knowledge_data = f.readlines()
         knowledge = random.choice(knowledge_data)

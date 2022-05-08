@@ -35,7 +35,7 @@ class Date_Update:
             year,month = self.year,self.month
             sentences = sentences.replace("今月",str(year)+"年"+str(month)+"月")
         if "来年" in sentences:
-            yaer=self.year+1
+            year = self.year+1
             sentences = sentences.replace("来年",str(year)) 
         for w in self.week_list:
             if w in sentences:
@@ -45,16 +45,16 @@ class Date_Update:
                     sentences = sentences.replace("再来週","")
                 elif "来週" in sentences:
                     diff = 7-(self.week-self.week_list.index(w))
-                    sentences=sentences.replace("来週","")
+                    sentences = sentences.replace("来週","")
                 else:
                     diff = self.week_list.index(w)-self.week
                     sentences = sentences.replace("今週","")
                 year,month,day = self.day_set(diff)
                 break    
         if self.week_list[self.key_week]+"日" in sentences:
-            sentences=sentences.replace(self.week_list[self.key_week]+"日",str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
+            sentences = sentences.replace(self.week_list[self.key_week]+"日",str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
         else:
-            sentences=sentences.replace(self.week_list[self.key_week],str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
+            sentences = sentences.replace(self.week_list[self.key_week],str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
         return sentences
                 
 
