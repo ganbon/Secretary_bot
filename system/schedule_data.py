@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 class Schedule_Table:
     def __init__(self,csv_file_path):
         self.csv_file_path = csv_file_path
@@ -13,6 +14,7 @@ class Schedule_Table:
         except FileNotFoundError:
             df = pd.DataFrame([],columns = self.clumns)
         self.df = df
+        self.expired_record()
         return df
 
     #更新
@@ -21,8 +23,19 @@ class Schedule_Table:
         self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
         return self.df
 
+    def expired_record(self):
+        now_date = datetime.now()
+        now_month = int(now_date.month)
+        now_day = int(now_date.day)
+        delete_data = self.df[(self.df['月'] <= now_month) & (self.df['日'] < now_day)]
+        self.delete_record(delete_data)
+            
     def delete_record(self,del_record):
-        self.df.drop(del_record.index,inplace = True)
+        if len(del_record) > 1:
+            for index,data in del_record.iterrows():
+                self.df.drop(index,inplace = True)
+            else:
+                self.df.drop(del_record.index,inplace = True)
         self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
 
 
