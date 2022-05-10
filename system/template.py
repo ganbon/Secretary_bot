@@ -54,6 +54,3 @@ class Template(Schedule_Table):
         else:
             out = None
         return out
-
-        
-        

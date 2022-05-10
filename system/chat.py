@@ -25,5 +25,3 @@ class Chat:
         self.tmplate.log_save()
         log_list = self.tmplate.log_load()
         return log_list
-        
-        

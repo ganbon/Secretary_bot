@@ -11,5 +11,3 @@ def scraping(url, file_path):
     text = '\n'.join(text_list)
     with open(file_path, 'w', encoding = 'utf_8') as f:
         f.write(text)
-
-

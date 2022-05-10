@@ -104,7 +104,3 @@ class Decoder(Discrimination):
         else:
             out = generate(self.input)
         return out
-
-        
-                
-            

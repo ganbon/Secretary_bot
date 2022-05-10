@@ -40,7 +40,6 @@ class Schedule_Table:
                 self.df.drop(del_record.index,inplace = True)
         self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
 
-
 '''        
 import math
 import pprint
