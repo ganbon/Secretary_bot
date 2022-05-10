@@ -4,6 +4,7 @@ import sys
 sys.path.append("..")
 from system.chat import Chat
 import os
+
 app = Flask(__name__)
 @app.context_processor
 def override_url_for():
@@ -19,17 +20,17 @@ def dated_url_for(endpoint, **values):
 
 @app.route('/')
 def chat():
-    chat=Chat()
-    log=chat.start()
+    chat = Chat()
+    log = chat.start()
     return render_template("chat.html",chat_text=log)
 
 @app.route('/', methods = ['POST'])
-def start_chat():
-    chat=Chat()
-    log=chat.start()
-    input=request.form.get("send")
-    if input!=None:
-        log=chat.run(input)
+def start_chat():    
+    chat = Chat()  
+    log = chat.start()
+    input = request.form.get("send")
+    if input != None:
+        log = chat.run(input)
     return render_template("chat.html",chat_text=log)
     
 
