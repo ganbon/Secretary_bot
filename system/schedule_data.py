@@ -29,15 +29,13 @@ class Schedule_Table:
         now_month = int(now_date.month)
         now_day = int(now_date.day)
         delete_data = self.df[(self.df['月'] <= now_month) & (self.df['日'] < now_day)]
+        print(delete_data)
         self.delete_record(delete_data)
             
     #予定を削除
     def delete_record(self, del_record):
-        if len(del_record) > 1:
-            for index,data in del_record.iterrows():
-                self.df.drop(index,inplace = True)
-            else:
-                self.df.drop(del_record.index,inplace = True)
+        for index,data in del_record.iterrows():
+            self.df.drop(index,inplace = True)
         self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
 
 '''        

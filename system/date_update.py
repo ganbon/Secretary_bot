@@ -14,8 +14,14 @@ class Date_Update:
     # 曖昧な表現を正確な日程に変換                                      
     def convert(self, sentences):
         self.key_week = self.week
+        if "来年" in sentences:
+            year = self.year+1
+            sentences = sentences.replace("来年",str(year))
         if "今日" in sentences:
-            sentences = sentences.replace("今日",f"{self.year}年{self.month}月{self.day}日")
+            year = self.year
+            month = self.month
+            day = self.day
+            sentences = sentences.replace("今日",f"{year}年{month}月{day}日")
         if "明日" in sentences:
             year, month, day = self.day_set(1)
             sentences = sentences.replace("明日",f"{year}年{month}月{day}日")
@@ -31,12 +37,10 @@ class Date_Update:
         if "来月" in sentences:
             year,month = self.month_set(1)
             sentences = sentences.replace("来月",f"{year}年{month}月")
-        if "今月" in sentences:
+        elif "今月" in sentences:
             year,month = self.year,self.month
             sentences = sentences.replace("今月",f"{year}年{month}月")
-        if "来年" in sentences:
-            year = self.year+1
-            sentences = sentences.replace("来年",str(year)) 
+
         for w in self.week_list:
             if w in sentences:
                 self.key_week = self.week_list.index(w)
@@ -101,7 +105,6 @@ class Date_Update:
         self.year = year
         self.month = month
         return year, month
-
 
 '''
 d=Date_Update()
