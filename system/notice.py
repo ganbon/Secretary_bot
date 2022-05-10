@@ -17,9 +17,9 @@ class Notice:
             now_day = int(now_date.day)
             now_hour = int(now_date.hour)
             now_minute = int(now_date.minute)
-            set_hour = [8,12,16,17,20]
-            if now_hour in set_hour and now_minute == 34:
-                plan_df = self.plan_data[(self.plan_data['月'] >= now_month) & (self.plan_data['日'] > now_day+1) | (now_day+7 > self.plan_data['日'])]
+            set_hour = [x for x in range(24)]
+            if now_hour in set_hour and now_minute == 0:
+                plan_df = self.plan_data[(self.plan_data['月'] >= now_month) & ((self.plan_data['日'] > now_day) | (now_day+7 >self.plan_data['日']))]
                 print(plan_df)
                 for index,data in plan_df.iterrows():
                     self.display(data)
@@ -38,6 +38,6 @@ class Notice:
             title = "秘書からのお知らせ",
             message = nt_messege,
             app_name = "秘書チャット",
-            app_icon = "image2.ico",
+            app_icon = "notice.ico",
             timeout = 10
         )

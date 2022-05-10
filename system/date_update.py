@@ -15,25 +15,25 @@ class Date_Update:
     def convert(self, sentences):
         self.key_week = self.week
         if "今日" in sentences:
-            sentences = sentences.replace("今日",str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
+            sentences = sentences.replace("今日",f"{self.year}年{self.month}月{self.day}日")
         if "明日" in sentences:
             year, month, day = self.day_set(1)
-            sentences = sentences.replace("明日",str(year)+"年"+str(month)+"月"+str(day)+"日")
+            sentences = sentences.replace("明日",f"{year}年{month}月{day}日")
         if  "明後日" in sentences:
             year,month,day = self.day_set(2)
-            sentences = sentences.replace("明後日",str(year)+"年"+str(month)+"月"+str(day)+"日")
+            sentences = sentences.replace("明後日",f"{year}年{month}月{day}日")
         if "明々後日" in sentences:
             year,month,day=self.day_set(3)
-            sentences=sentences.replace("明々後日",str(year)+"年"+str(month)+"月"+str(day)+"日")
+            sentences=sentences.replace("明々後日",f"{year}年{month}月{day}日")
         if "再来月" in sentences:
             year,month = self.month_set(2)
-            sentences=sentences.replace("再来月",str(year)+"年"+str(month)+"月")
+            sentences=sentences.replace("再来月",f"{year}年{month}月")
         if "来月" in sentences:
             year,month = self.month_set(1)
-            sentences = sentences.replace("来月",str(year)+"年"+str(month)+"月")
+            sentences = sentences.replace("来月",f"{year}年{month}月")
         if "今月" in sentences:
             year,month = self.year,self.month
-            sentences = sentences.replace("今月",str(year)+"年"+str(month)+"月")
+            sentences = sentences.replace("今月",f"{year}年{month}月")
         if "来年" in sentences:
             year = self.year+1
             sentences = sentences.replace("来年",str(year)) 
@@ -52,9 +52,9 @@ class Date_Update:
                 year,month,day = self.day_set(diff)
                 break    
         if self.week_list[self.key_week]+"日" in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week]+"日",str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
+            sentences = sentences.replace(self.week_list[self.key_week]+"日",f"{year}年{month}月{self.day}日")
         else:
-            sentences = sentences.replace(self.week_list[self.key_week],str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日")
+            sentences = sentences.replace(self.week_list[self.key_week],f"{year}年{month}月{self.day}日")
         return sentences
                 
 

@@ -1,11 +1,9 @@
 from system.decoder import Decoder
 from system.template import Template
-from system.notice import Notice
 
 class Chat:
     def __init__(self):
         self.tmplate = Template()
-        #self.notice = Notice()
         
     #チャットの初期設定
     def start(self):
@@ -18,9 +16,8 @@ class Chat:
     
     
     #実装
-    def run(self,input):
-        log_list=self.tmplate.log_load()    
-        #self.notice.run()
+    def run(self, input):
+        log_list = self.tmplate.log_load()    
         decorder = Decoder(input)
         output = decorder.decision()
         self.tmplate.inputlog_set(input)

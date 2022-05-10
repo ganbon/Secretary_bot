@@ -39,14 +39,12 @@ class Template(Schedule_Table):
         if self.day not in day_csv_data or day_csv_data == []:
             if 5 < self.hour < 12:
                 out = "おはようございます。"
-            elif 13 < self.hour < 18:
+            elif 12 <= self.hour < 18:
                 out = "こんにちは。"
             else:
                 out = "こんばんは。"
-            out += "今日は"+str(self.year)+"年"+str(self.month)+"月"+str(self.day)+"日"+self.week+"です。\n今日の予定は"
-            print(self.schedule_csv_data)
+            out += f"今日は{self.year}年{self.month}月{self.day}日{self.week}です。\n今日の予定は"
             teach_csv_data = self.schedule_csv_data[(self.schedule_csv_data["月"] == self.month) & (self.schedule_csv_data["日"] == self.day) & (self.schedule_csv_data["年"] == self.year)]
-            print(teach_csv_data)
             if teach_csv_data.empty:
                 out += "特にありません。"
             else:

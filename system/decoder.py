@@ -7,15 +7,15 @@ import os
 from system.text_get import scraping
 from system.emotion import generate
 class Decoder(Discrimination):
-    def __init__(self,input,csv_file_path="csv_data/schedule_2022.csv"):
+    def __init__(self, input, csv_file_path = "csv_data/schedule_2022.csv"):
         super().__init__(csv_file_path)
-        self.wakati=MeCab.Tagger("-Owakati")
-        self.input=unicodedata.normalize('NFKC', input)
-        self.article_dir="article_data/"
+        self.wakati = MeCab.Tagger("-Owakati")
+        self.input = unicodedata.normalize('NFKC', input)
+        self.article_dir = "article_data/"
                 
     #処理決定のための関数
     def decision(self):
-        sentences=self.morpheme(self.input)
+        sentences = self.morpheme(self.input)
         #覚えておいてほしい予定を覚えててくれる
         if "記憶" in sentences or "覚え" in sentences:
             plan_data = self.schedule_register(self.input)
@@ -26,13 +26,13 @@ class Decoder(Discrimination):
                 out="その予定はすでに登録されています。"
             else:
                 if plan_data[3] == None:
-                    out = str(plan_data[0])+"年"+str(plan_data[1])+"月"+str(plan_data[2])+"日に"+plan_data[5]+"ですね。覚えておきます。"
+                    out = f"{plan_data[0]}+年{plan_data[1]}月{plan_data[2]}日に{plan_data[5]}ですね。覚えておきます。"
                 else:
-                    out = str(plan_data[0])+"年"+str(plan_data[1])+"月"+str(plan_data[2])+"日"+str(plan_data[3])+"時"+str(plan_data[4])+"分に"+plan_data[5]+"ですね。覚えておきます。"
+                    out = f"{plan_data[0]}+年{plan_data[1]}月{plan_data[2]}日{plan_data[3]}時{plan_data[4]}分に{plan_data[5]}ですね。覚えておきます。"
                     
         #指定した日程の予定を教えてくれる
         elif "予定" in sentences and ("教え" in sentences or "?" in sentences):
-            month,day,plan_data=self.schedule_teach(self.input)
+            month,day,plan_data = self.schedule_teach(self.input)
             if plan_data.empty:
                 out = "予定は特にありません。"
             else:
@@ -61,7 +61,7 @@ class Decoder(Discrimination):
         elif "抽出" in sentences and "https" in sentences and "要約" in sentences:
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
             article_path = self.article_dir+"/article"+str(data_sum)+".txt"
-            url=self.input.split(' ')[1]
+            url = self.input.split(' ')[1]
             try:
                 scraping(url,article_path)
                 summary_path = '../'+article_path
@@ -90,11 +90,11 @@ class Decoder(Discrimination):
         
         #曜日の確認
         elif "何曜日" in self.input:
-            year,month,day,week=self.week_teach(self.input)
+            year,month,day,week = self.week_teach(self.input)
             if year == None:
                 out = "いつの話ですか？"
             else:   
-                out = str(year)+"年"+str(month)+"月"+str(day)+"日は"+week+"です。"
+                out = f"{year}年{month}月{day}日は{week}です。"
         
         #豆知識教えてくれる
         elif "豆知識" in self.input and "教え" in self.input:
