@@ -20,7 +20,7 @@ class Schedule_Table:
     #更新
     def update_table(self, update_date):
         self.df.loc[len(self.df)] = update_date
-        self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
+        self.df.to_csv("csv_data/schedule_2022.csv", mode = 'w', index = False, header = False)
         return self.df
 
     #すでに過ぎた予定を削除
@@ -36,7 +36,7 @@ class Schedule_Table:
     def delete_record(self, del_record):
         for index,data in del_record.iterrows():
             self.df.drop(index,inplace = True)
-        self.df.to_csv("csv_data/schedule_2022.csv",mode = 'w',index = False,header = False)
+        self.df.to_csv("csv_data/schedule_2022.csv", mode = 'w', index = False, header = False)
 
 '''        
 import math

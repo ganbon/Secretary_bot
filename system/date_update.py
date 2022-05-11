@@ -5,15 +5,18 @@ class Date_Update:
     def __init__(self):
         now_date = datetime.now()
         self.week_list = ["月曜", "火曜", "水曜", "木曜", "金曜", "土曜", "日曜"]
+        self.date_key = ["来年","今日","明日","明後日","明々後日",
+                         "再来月","来月","今月","再来週","来週","今週"]
         self.week = datetime.today().weekday()
         self.year = int(now_date.year)
         self.month = int(now_date.month)
         self.day = int(now_date.day)
+        self.key_week = self.week
         self.special_month = [2, 4, 6, 9, 11]
+        
 
     # 曖昧な表現を正確な日程に変換                                      
     def convert(self, sentences):
-        self.key_week = self.week
         if "来年" in sentences:
             year = self.year+1
             sentences = sentences.replace("来年",str(year))
@@ -40,25 +43,33 @@ class Date_Update:
         elif "今月" in sentences:
             year,month = self.year,self.month
             sentences = sentences.replace("今月",f"{year}年{month}月")
-
         for w in self.week_list:
             if w in sentences:
                 self.key_week = self.week_list.index(w)
-                if "再来週" in sentences:
-                    diff = 14-(self.week-self.week_list.index(w))
-                    sentences = sentences.replace("再来週","")
-                elif "来週" in sentences:
-                    diff = 7-(self.week-self.week_list.index(w))
-                    sentences = sentences.replace("来週","")
-                else:
-                    diff = self.week_list.index(w)-self.week
-                    sentences = sentences.replace("今週","")
-                year,month,day = self.day_set(diff)
-                break    
-        if self.week_list[self.key_week]+"日" in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week]+"日",f"{year}年{month}月{self.day}日")
-        else:
-            sentences = sentences.replace(self.week_list[self.key_week],f"{year}年{month}月{self.day}日")
+        if "再来週" in sentences:
+            diff = 14-(self.week-self.key_week)
+            year,month,day = self.day_set(diff)
+            sentences = sentences.replace("再来週","")
+            if self.week_list[self.key_week]+"日" in sentences:
+                sentences = sentences.replace(self.week_list[self.key_week]+"日",f"{year}年{month}月{self.day}日")
+            else:
+                sentences = sentences.replace(self.week_list[self.key_week],f"{year}年{month}月{self.day}日")
+        elif "来週" in sentences:
+            diff = 7-(self.week-self.key_week)
+            year,month,day = self.day_set(diff)
+            sentences = sentences.replace("来週","")
+            if self.week_list[self.key_week]+"日" in sentences:
+                sentences = sentences.replace(self.week_list[self.key_week]+"日",f"{year}年{month}月{self.day}日")
+            else:
+                sentences = sentences.replace(self.week_list[self.key_week],f"{year}年{month}月{self.day}日")
+        elif "今週" in sentences:
+            diff = self.key_week-self.week
+            year,month,day = self.day_set(diff)
+            sentences = sentences.replace("今週","")
+            if self.week_list[self.key_week]+"日" in sentences:
+                sentences = sentences.replace(self.week_list[self.key_week]+"日",f"{year}年{month}月{self.day}日")
+            else:
+                sentences = sentences.replace(self.week_list[self.key_week],f"{year}年{month}月{self.day}日")   
         return sentences
                 
 

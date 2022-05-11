@@ -26,9 +26,9 @@ class Decoder(Discrimination):
                 out="その予定はすでに登録されています。"
             else:
                 if plan_data[3] == None:
-                    out = f"{plan_data[0]}+年{plan_data[1]}月{plan_data[2]}日に{plan_data[5]}ですね。覚えておきます。"
+                    out = f"{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日に{plan_data[5]}ですね。覚えておきます。"
                 else:
-                    out = f"{plan_data[0]}+年{plan_data[1]}月{plan_data[2]}日{plan_data[3]}時{plan_data[4]}分に{plan_data[5]}ですね。覚えておきます。"
+                    out = f"{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日{plan_data[3]}時{plan_data[4]}分に{plan_data[5]}ですね。覚えておきます。"
                     
         #指定した日程の予定を教えてくれる
         elif "予定" in sentences and ("教え" in sentences or "?" in sentences):

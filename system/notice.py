@@ -11,16 +11,15 @@ class Notice:
         self.plan_data=schedule.create_table()
                 
     def run(self):
+        set_hour = [x for x in range(24)]
         while(1):
             now_date = datetime.now()
             now_month = int(now_date.month)
             now_day = int(now_date.day)
             now_hour = int(now_date.hour)
             now_minute = int(now_date.minute)
-            set_hour = [x for x in range(24)]
             if now_hour in set_hour and now_minute == 0:
                 plan_df = self.plan_data[(self.plan_data['月'] >= now_month) & ((self.plan_data['日'] > now_day) | (now_day+7 >self.plan_data['日']))]
-                print(plan_df)
                 for index,data in plan_df.iterrows():
                     self.display(data)
                 time.sleep(60)

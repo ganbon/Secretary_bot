@@ -83,12 +83,12 @@ class Discrimination(Schedule_Table):
         plan_minute = self.date_specify("分",input_list)
         if plan_month == []:
             plan_month = self.month
-        elif plan_hour == []:
+        if plan_hour == []:
             plan_hour = None
             plan_minute = None
-        elif plan_hour != []:
+        if plan_hour != []:
             plan_minute = 0
-        elif plan_day == []:
+        if plan_day == []:
             return 0
         plan_data = [self.year,plan_month,plan_day,plan_hour,plan_minute,plan_contents]
         if plan_data in schedule_list:
