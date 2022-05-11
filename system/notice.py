@@ -30,13 +30,13 @@ class Notice:
                     task[i] = None
         year, month, day, hour,minute,data = task
         if hour == None:
-            nt_messege = f'{month}月{day}日に{data}の予定が入ってあります。'
+            nt_messege = f'{int(month)}月{int(day)}日に{data}の予定が入ってあります。'
         else:
-            nt_messege = f'{month}月{day}日{hour}時{minute}分に{data}の予定が入ってあります。'
+            nt_messege = f'{int(month)}月{int(day)}日{int(hour)}時{int(minute)}分に{data}の予定が入ってあります。'
         notification.notify(
             title = "秘書からのお知らせ",
             message = nt_messege,
             app_name = "秘書チャット",
-            app_icon = "notice.ico",
+            app_icon = "app.ico",
             timeout = 10
         )

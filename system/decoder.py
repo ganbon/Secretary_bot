@@ -4,6 +4,7 @@ import requests
 from system.schedule import Discrimination
 from system.summany import generate_text_from_model
 import os
+import re
 from system.text_get import scraping
 from system.emotion import generate
 class Decoder(Discrimination):
@@ -11,7 +12,8 @@ class Decoder(Discrimination):
         super().__init__(csv_file_path)
         self.wakati = MeCab.Tagger("-Owakati")
         self.input = unicodedata.normalize('NFKC', input)
-        self.article_dir = "article_data/"
+        self.article_dir = "text_data/"
+        self.url_pattern="https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
                 
     #処理決定のための関数
     def decision(self):
@@ -58,13 +60,14 @@ class Decoder(Discrimination):
                 out = "予定を取り消しました"
         
         #urlの内容を抽出して要約
-        elif "抽出" in sentences and "https" in sentences and "要約" in sentences:
+        elif "抽出" in sentences and re.search(self.url_pattern,self.input) and "要約" in sentences:
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
-            article_path = self.article_dir+"/article"+str(data_sum)+".txt"
-            url = self.input.split(' ')[1]
+            article_path = self.article_dir+"/text_data"+str(data_sum)+".txt"
+            url_oj = re.search(self.url_pattern,self.input)
+            url = url_oj.group()
             try:
                 scraping(url,article_path)
-                summary_path = '../'+article_path
+                summary_path = article_path
                 generated_texts = generate_text_from_model(summary_path)
                 out = generated_texts[0]
                 out += "\nurl内の記事を取り出し要約しました"
@@ -78,10 +81,11 @@ class Decoder(Discrimination):
             out = generated_texts[0]
 
         #webページをテキストファイルに変換
-        elif "抽出" in sentences and "https" in sentences:
+        elif "抽出" in sentences and re.search(self.url_pattern,self.input):
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
-            article_path = self.article_dir+"/article"+str(data_sum)+".txt"
-            url = self.input.split(' ')[1]
+            article_path = self.article_dir+"/text_data"+str(data_sum)+".txt"
+            url_oj = re.search(self.url_pattern,self.input)
+            url = url_oj.group()
             try:
                 scraping(url,article_path)
                 out = "url内の記事を取り出しました"
