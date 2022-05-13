@@ -5,6 +5,8 @@ from system.date_update import Date_Update
 from system.schedule_data import Schedule_Table
 import datetime as dt
 import math
+import requests
+import pickle
 import random
 
 class Discrimination(Schedule_Table):
@@ -42,10 +44,13 @@ class Discrimination(Schedule_Table):
     #予定の内容抽出
     def content_extract(self,input_list,speech_list):
         out_list = []
-        ban_word = ["覚え","記憶","予定"]
+        ban_word = ["覚え","記憶"]
+        pass_word = ["予定","こと"]
         for i,input in enumerate(input_list):
             if input in ban_word:
                 break
+            elif input in pass_word:
+                continue
             elif input.isdecimal() and input_list[i+1] in self.date_key:
                 continue
             elif (input_list[i-1]).isdecimal() and input in self.date_key:
@@ -163,3 +168,48 @@ class Discrimination(Schedule_Table):
             knowledge_data = f.readlines()
         knowledge = random.choice(knowledge_data)
         return knowledge 
+    
+    #天気予報
+    def weather_teach(self, input, area):
+        weather_data=[]
+        diff_day = 0
+        plan_day = 0
+        with open("weather_data/localmap_data.pkl", "rb") as tf:
+            localmap_dict = pickle.load(tf)
+        area_list = list(localmap_dict.keys())
+        input = self.date_update.convert(input)
+        input_list = self.morpheme(input)
+        plan_day = self.date_specify("日",input_list)
+        diff_day = plan_day-self.day
+        if diff_day > 2:
+            return plan_day,weather_data
+        for word in  input_list:
+            if word in area_list:
+                map_code = localmap_dict[word]
+                print(word)
+                if isinstance(map_code,list):
+                    for area in map_code:
+                        code = localmap_dict[area]
+                        batch_data = self.get_weather(code,diff_day,area)                          
+                        weather_data.append(batch_data)
+                else: 
+                    batch_data = self.get_weather(map_code,diff_day,word)                          
+                    weather_data.append(batch_data)
+        return plan_day,weather_data
+   
+    
+    def get_weather(self,code,diff_day,word):
+        weather_data = []
+        url = "https://weather.tsukumijima.net/api/forecast/city/" + code
+        try:  
+            response = requests.get(url)
+            response.raise_for_status()
+            weather_json = response.json()
+            data = weather_json['forecasts'][diff_day]
+            weather = data['telop']
+            rain_data = data['chanceOfRain']
+            weather_data=[word,weather,rain_data['T00_06'],rain_data['T06_12'],rain_data['T12_18'],rain_data['T18_24']]
+            return weather_data
+        except requests.exceptions.RequestException:
+            return weather_data
+

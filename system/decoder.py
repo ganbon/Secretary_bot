@@ -13,6 +13,7 @@ class Decoder(Discrimination):
         self.wakati = MeCab.Tagger("-Owakati")
         self.input = unicodedata.normalize('NFKC', input)
         self.article_dir = "text_data/"
+        self.map_code="高松"
         self.url_pattern="https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
                 
     #処理決定のための関数
@@ -104,7 +105,24 @@ class Decoder(Discrimination):
         elif "豆知識" in self.input and "教え" in self.input:
             knowledge = self.knowledge_teach()
             out = knowledge.replace('\n','')
-        #該当しない入力の場合のときその言葉に対して感情表現をする（ないよりはマシかと…）
+        #該当しない入力の場合のときその言葉に対して感情表現をする
+        elif "天気" in sentences and ("教え" in sentences or "?" in sentences):
+            plan_day,weather_data = self.weather_teach(self.input,self.map_code)
+            print(plan_day,weather_data)
+            if weather_data==[]:
+                out = "天気の取得に失敗しました。"
+            else:
+                out=f"{plan_day}日は\n"
+                for i,weather in enumerate(weather_data):
+                    area,ws,rain_data1,rain_data2,rain_data3,rain_data4 = weather
+                    if len(weather_data) > 1:
+                        out+=f"{area}が{ws}。\n降水確率が0~6時{rain_data1}、6～12時{rain_data2}、12～18時{rain_data3}、18～24時{rain_data4}"
+                    else:
+                        out+=f"{ws}。\n降水確率が0~6時{rain_data1}、6～12時{rain_data2}、12～18時{rain_data3}、18～24時{rain_data4}"
+                    if len(weather_data) > 1:
+                        out += "\n"
+                out+="です。"
+        #該当しない入力の場合のときその言葉に対して感情表現をする
         else:
             out = generate(self.input)
         return out

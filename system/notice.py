@@ -2,7 +2,7 @@ from datetime import datetime, time
 import math
 from plyer import notification
 import pandas as pd
-import time
+import time 
 from system.schedule_data import Schedule_Table
 
 class Notice:
