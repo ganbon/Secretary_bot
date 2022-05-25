@@ -30,9 +30,9 @@ class Notice:
                     task[i] = None
         year, month, day, hour,minute,data = task
         if hour == None:
-            nt_messege = f'{int(month)}月{int(day)}日に{data}の予定が入ってあります。'
+            nt_messege = f'{int(month)}月{int(day)}日に{data}の予定があります。'
         else:
-            nt_messege = f'{int(month)}月{int(day)}日{int(hour)}時{int(minute)}分に{data}の予定が入ってあります。'
+            nt_messege = f'{int(month)}月{int(day)}日{int(hour)}時{int(minute)}分に{data}の予定があります。'
         notification.notify(
             title = "秘書からのお知らせ",
             message = nt_messege,

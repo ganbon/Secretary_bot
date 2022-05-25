@@ -37,22 +37,3 @@ class Schedule_Table:
         for index,data in del_record.iterrows():
             self.df.drop(index,inplace = True)
         self.df.to_csv("csv_data/schedule_2022.csv", mode = 'w', index = False, header = False)
-
-'''        
-import math
-import pprint
-s=Schedule_Table("../csv_data/schedule_2022.csv")
-a=s.create_table()
-b=a.values.tolist()
-for i,s_list in enumerate(b):
-            for j,s in enumerate(s_list[:5]):
-                if math.isnan(float(s)):
-                    b[i][j]=None
-pprint.pprint(b)
-pprint.pprint(a)
-print(b[4][3])
-print(float('nan'))
-print(math.isnan(float(b[4][3])))
-if [2022,5,7,float('nan'),float('nan'),'テスト'] in b:
-    print(2)
-''' 

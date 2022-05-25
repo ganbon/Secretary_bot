@@ -55,7 +55,7 @@ class Discrimination(Schedule_Table):
                 continue
             elif (input_list[i-1]).isdecimal() and input in self.date_key:
                 continue
-            elif out_list != [] and speech_list[i-1] == "名詞" and speech_list[i+1] == "名詞" and input_list[i+1] not in ban_word:
+            elif out_list != [] and speech_list[i-1] == "名詞" and speech_list[i+1] == "名詞" and input_list[i+1] not in pass_word:
                 out_list.append(input_list[i])
             elif speech_list[i] == "名詞":
                 out_list.append(input)
@@ -84,14 +84,13 @@ class Discrimination(Schedule_Table):
         plan_day = self.date_specify("日",input_list)
         plan_month = self.date_specify("月",input_list)
         plan_hour = self.date_specify("時",input_list)
-        plan_hour = self.date_specify("時",input_list)
         plan_minute = self.date_specify("分",input_list)
         if plan_month == []:
             plan_month = self.month
         if plan_hour == []:
             plan_hour = None
             plan_minute = None
-        if plan_hour != []:
+        if plan_hour != [] and plan_minute == []:
             plan_minute = 0
         if plan_day == []:
             return 0
@@ -212,4 +211,3 @@ class Discrimination(Schedule_Table):
             return weather_data
         except requests.exceptions.RequestException:
             return weather_data
-

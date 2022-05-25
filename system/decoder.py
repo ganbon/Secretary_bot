@@ -31,8 +31,7 @@ class Decoder(Discrimination):
                 if plan_data[3] == None:
                     out = f"{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日に{plan_data[5]}ですね。覚えておきます。"
                 else:
-                    out = f"{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日{plan_data[3]}時{plan_data[4]}分に{plan_data[5]}ですね。覚えておきます。"
-                    
+                    out = f"{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日{plan_data[3]}時{plan_data[4]}分に{plan_data[5]}ですね。覚えておきます。"            
         #指定した日程の予定を教えてくれる
         elif "予定" in sentences and ("教え" in sentences or "?" in sentences):
             month,day,plan_data = self.schedule_teach(self.input)
@@ -47,8 +46,7 @@ class Decoder(Discrimination):
                     out = str(month)+"月"+str(day)+"日の予定は\n"
                     for plan in plan_data["予定"]:
                         out+=plan+"\n"
-                out += "です。"
-        
+                out += "です。"   
         #予定のキャンセル
         elif ("削除" in sentences or "消し" in sentences) and "予定" in sentences:
             record = self.schedule_get(self.input)
@@ -58,8 +56,7 @@ class Decoder(Discrimination):
                 out = "該当する予定が見つかりませんでした"
             else:
                 self.delete_record(record)
-                out = "予定を取り消しました"
-        
+                out = "予定を取り消しました"    
         #urlの内容を抽出して要約
         elif "抽出" in sentences and re.search(self.url_pattern,self.input) and "要約" in sentences:
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
@@ -74,13 +71,11 @@ class Decoder(Discrimination):
                 out += "\nurl内の記事を取り出し要約しました"
             except requests.exceptions.SSLError:
                out = "すみません失敗しました" 
-        
         #長文を1フレーズに要約
         elif "要約" in sentences:
             text = self.input.split(" ")[1]
             generated_texts = generate_text_from_model(text)
             out = generated_texts[0]
-
         #webページをテキストファイルに変換
         elif "抽出" in sentences and re.search(self.url_pattern,self.input):
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
@@ -92,7 +87,6 @@ class Decoder(Discrimination):
                 out = "url内の記事を取り出しました"
             except requests.exceptions.SSLError:
                out = "すみません失敗しました" 
-        
         #曜日の確認
         elif "何曜日" in self.input:
             year,month,day,week = self.week_teach(self.input)
@@ -100,7 +94,6 @@ class Decoder(Discrimination):
                 out = "いつの話ですか？"
             else:   
                 out = f"{year}年{month}月{day}日は{week}です。"
-        
         #豆知識教えてくれる
         elif "豆知識" in self.input and "教え" in self.input:
             knowledge = self.knowledge_teach()
