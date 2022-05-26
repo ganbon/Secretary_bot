@@ -185,7 +185,6 @@ class Discrimination(Schedule_Table):
         for word in  input_list:
             if word in area_list:
                 map_code = localmap_dict[word]
-                print(word)
                 if isinstance(map_code,list):
                     for area in map_code:
                         code = localmap_dict[area]

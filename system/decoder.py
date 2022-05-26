@@ -101,7 +101,6 @@ class Decoder(Discrimination):
         #該当しない入力の場合のときその言葉に対して感情表現をする
         elif "天気" in sentences and ("教え" in sentences or "?" in sentences):
             plan_day,weather_data = self.weather_teach(self.input,self.map_code)
-            print(plan_day,weather_data)
             if weather_data==[]:
                 out = "天気の取得に失敗しました。"
             else:

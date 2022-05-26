@@ -29,7 +29,6 @@ class Schedule_Table:
         now_month = int(now_date.month)
         now_day = int(now_date.day)
         delete_data = self.df[(self.df['月'] <= now_month) & (self.df['日'] < now_day)]
-        print(delete_data)
         self.delete_record(delete_data)
             
     #予定を削除
