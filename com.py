@@ -12,29 +12,29 @@ class Command:
         self.notice = Notice()
         
     def set_up(self):   
-        webbrowser.open("http://127.0.0.1:5000/",1)
+        webbrowser.open('http://127.0.0.1:5000/', 1)
 
     def run(self):
-        command_anaconda = ['activate','deep']
-        command_python = ['python','app.py']    
+        command_anaconda = ['activate', 'deep']
+        command_python = ['python', 'app.py']    
         anaconda = subprocess.Popen(command_anaconda, shell = True)
         anaconda.communicate()
         self.python_file = subprocess.Popen(command_python, shell = True)
         self.python_file.communicate()
         
-    def quit(self,file_name):
+    def quit(self, file_name):
         self.pid_list = self.find_process(file_name)
         if self.pid_list != []:
             for p in self.pid_list:
                 command_quit = ['taskkill','/pid',str(p),'/F']
-                quit = subprocess.Popen(command_quit,shell=True)
+                quit = subprocess.Popen(command_quit, shell=True)
                 quit.communicate()
-                print("停止しました")
+                print('停止しました')
             self.pid_list = []
         else:
             pass
 
-    def find_process(self,file_name):
+    def find_process(self, file_name):
         cwd = os.getcwd()
         pid_list = []
         for proc in psutil.process_iter():
@@ -42,32 +42,32 @@ class Command:
                 pid_list.append(proc.pid)
         return pid_list
     
-    def app_switch(self,btn):
+    def app_switch(self, btn):
         self.callback(btn)
-        if btn.cget('bg')=='#fef4f4':
-            btn.config(text='アプリ起動')
+        if btn.cget('bg') == '#fef4f4':
+            btn.config(text = 'アプリ起動')
             self.quit('app.py')
         else:
-            btn.config(text='アプリ停止')
+            btn.config(text = 'アプリ停止')
             self.run()
         
     def app_button_clicked(self, btn):
-        sv_app_thread = threading.Thread(target=self.app_switch,args=(btn,),daemon=True)
+        sv_app_thread = threading.Thread(target = self.app_switch, args = (btn,), daemon = True)
         sv_app_thread.start()
         
     def notice_switch(self, btn):
-        if btn.cget('bg')=='#e6cde3':
-            btn.config(text='通知ON')
+        if btn.cget('bg') == '#e6cde3':
+            btn.config(text = '通知ON')
             self.callback(btn)
             
             return
         else:
             self.callback(btn)
-            btn.config(text='通知OFF')
+            btn.config(text = '通知OFF')
             self.notice.run()
         
     def notice_button_clicked(self, btn):
-        notice_thread = threading.Thread(target = self.notice_switch, args = (btn,),daemon = True)
+        notice_thread = threading.Thread(target = self.notice_switch, args = (btn,), daemon = True)
         notice_thread.start()
     
     def display_app_clicked(self):
@@ -76,7 +76,7 @@ class Command:
     
     def callback(self, btn):
         current_color = btn.cget('bg')
-        if current_color == "#fef4f4":
-            btn.config(bg = "#e6cde3")
+        if current_color == '#fef4f4':
+            btn.config(bg = '#e6cde3')
         else:
-            btn.config(bg = "#fef4f4")
+            btn.config(bg = '#fef4f4')

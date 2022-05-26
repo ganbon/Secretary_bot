@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 @app.context_processor
 def override_url_for():
-    return dict(url_for=dated_url_for)
+    return dict(url_for = dated_url_for)
 
 def dated_url_for(endpoint, **values):
     if endpoint == 'static':
@@ -22,7 +22,7 @@ def dated_url_for(endpoint, **values):
 def chat():
     chat = Chat()
     log = chat.start()
-    return render_template("chat.html",chat_text=log)
+    return render_template("chat.html", chat_text=log)
 
 @app.route('/', methods = ['POST'])
 def start_chat():    
@@ -31,8 +31,8 @@ def start_chat():
     input = request.form.get("send")
     if input != None:
         log = chat.run(input)
-    return render_template("chat.html",chat_text=log)
+    return render_template("chat.html", chat_text = log)
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug = True)
