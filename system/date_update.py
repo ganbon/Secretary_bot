@@ -4,7 +4,7 @@ from datetime import datetime
 class Date_Update:
     def __init__(self):
         now_date = datetime.now()
-        self.week_list = ["月曜", "火曜", "水曜", "木曜", "金曜", "土曜", "日曜"]
+        self.week_list = ['月曜', '火曜', '水曜', '木曜', '金曜', '土曜', '日曜']
         self.week = datetime.today().weekday()
         self.year = int(now_date.year)
         self.month = int(now_date.month)
@@ -15,51 +15,51 @@ class Date_Update:
 
     # 曖昧な表現を正確な日程に変換                                      
     def convert(self, sentences):
-        if "来年" in sentences:
+        if '来年' in sentences:
             year = self.year+1
-            sentences = sentences.replace("来年",str(year))
-        if "今日" in sentences:
+            sentences = sentences.replace('来年', str(year))
+        if '今日' in sentences:
             year = self.year
             month = self.month
             day = self.day
-            sentences = sentences.replace("今日",f"{year}年{month}月{day}日")
-        if "明日" in sentences:
+            sentences = sentences.replace('今日', f'{year}年{month}月{day}日')
+        if '明日' in sentences:
             year, month, day = self.day_set(1)
-            sentences = sentences.replace("明日",f"{year}年{month}月{day}日")
-        if  "明後日" in sentences:
+            sentences = sentences.replace('明日', f'{year}年{month}月{day}日')
+        if  '明後日' in sentences:
             year,month,day = self.day_set(2)
-            sentences = sentences.replace("明後日",f"{year}年{month}月{day}日")
-        if "明々後日" in sentences:
+            sentences = sentences.replace('明後日', f'{year}年{month}月{day}日')
+        if '明々後日' in sentences:
             year,month,day=self.day_set(3)
-            sentences=sentences.replace("明々後日",f"{year}年{month}月{day}日")
-        if "再来月" in sentences:
+            sentences=sentences.replace('明々後日', f'{year}年{month}月{day}日')
+        if '再来月' in sentences:
             year,month = self.month_set(2)
-            sentences=sentences.replace("再来月",f"{year}年{month}月")
-        if "来月" in sentences:
+            sentences=sentences.replace('再来月', f'{year}年{month}月')
+        if '来月' in sentences:
             year,month = self.month_set(1)
-            sentences = sentences.replace("来月",f"{year}年{month}月")
-        elif "今月" in sentences:
+            sentences = sentences.replace('来月', f'{year}年{month}月')
+        elif '今月' in sentences:
             year,month = self.year,self.month
-            sentences = sentences.replace("今月",f"{year}年{month}月")
+            sentences = sentences.replace('今月', f'{year}年{month}月')
         for w in self.week_list:
             if w in sentences:
                 self.key_week = self.week_list.index(w)
-        if "再来週" in sentences:
+        if '再来週' in sentences:
             diff = 14-(self.week-self.key_week)
             year,month,day = self.day_set(diff)
-            sentences = sentences.replace("再来週","")
-        elif "来週" in sentences:
+            sentences = sentences.replace('再来週','')
+        elif '来週' in sentences:
             diff = 7-(self.week-self.key_week)
             year,month,day = self.day_set(diff)
-            sentences = sentences.replace("来週","")
-        elif "今週" in sentences:
+            sentences = sentences.replace('来週','')
+        elif '今週' in sentences:
             diff = self.key_week-self.week
             year,month,day = self.day_set(diff)
-            sentences = sentences.replace("今週","")
-        if self.week_list[self.key_week]+"日" in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week]+"日",f"{year}年{month}月{self.day}日")
+            sentences = sentences.replace('今週','')
+        if self.week_list[self.key_week]+'日' in sentences:
+            sentences = sentences.replace(self.week_list[self.key_week]+'日', f'{year}年{month}月{self.day}日')
         elif self.week_list[self.key_week] in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week],f"{year}年{month}月{self.day}日")   
+            sentences = sentences.replace(self.week_list[self.key_week], f'{year}年{month}月{self.day}日')   
         return sentences
                 
     # 日にちの変換

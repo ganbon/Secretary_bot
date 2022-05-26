@@ -64,7 +64,7 @@ class Decoder(Discrimination):
             url_oj = re.search(self.url_pattern,self.input)
             url = url_oj.group()
             try:
-                scraping(url,article_path)
+                scraping(url, article_path)
                 summary_path = article_path
                 generated_texts = generate_text_from_model(summary_path)
                 out = generated_texts[0]
@@ -77,13 +77,13 @@ class Decoder(Discrimination):
             generated_texts = generate_text_from_model(text)
             out = generated_texts[0]
         #webページをテキストファイルに変換
-        elif "抽出" in sentences and re.search(self.url_pattern,self.input):
+        elif "抽出" in sentences and re.search(self.url_pattern, self.input):
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
             article_path = self.article_dir+"/text_data"+str(data_sum)+".txt"
             url_oj = re.search(self.url_pattern,self.input)
             url = url_oj.group()
             try:
-                scraping(url,article_path)
+                scraping(url, article_path)
                 out = "url内の記事を取り出しました"
             except requests.exceptions.SSLError:
                out = "すみません失敗しました" 
@@ -100,20 +100,20 @@ class Decoder(Discrimination):
             out = knowledge.replace('\n','')
         #該当しない入力の場合のときその言葉に対して感情表現をする
         elif "天気" in sentences and ("教え" in sentences or "?" in sentences):
-            plan_day,weather_data = self.weather_teach(self.input,self.map_code)
-            if weather_data==[]:
+            plan_day,weather_data = self.weather_teach(self.input, self.map_code)
+            if weather_data == []:
                 out = "天気の取得に失敗しました。"
             else:
                 out=f"{plan_day}日は\n"
                 for i,weather in enumerate(weather_data):
                     area,ws,rain_data1,rain_data2,rain_data3,rain_data4 = weather
                     if len(weather_data) > 1:
-                        out+=f"{area}が{ws}。\n降水確率が0~6時{rain_data1}、6～12時{rain_data2}、12～18時{rain_data3}、18～24時{rain_data4}"
+                        out += f"{area}が{ws}。\n降水確率が0~6時{rain_data1}、6～12時{rain_data2}、12～18時{rain_data3}、18～24時{rain_data4}"
                     else:
-                        out+=f"{ws}。\n降水確率が0~6時{rain_data1}、6～12時{rain_data2}、12～18時{rain_data3}、18～24時{rain_data4}"
+                        out += f"{ws}。\n降水確率が0~6時{rain_data1}、6～12時{rain_data2}、12～18時{rain_data3}、18～24時{rain_data4}"
                     if len(weather_data) > 1:
                         out += "\n"
-                out+="です。"
+                out += "です。"
         #該当しない入力の場合のときその言葉に対して感情表現をする
         else:
             out = generate(self.input)

@@ -7,8 +7,8 @@ from system.schedule_data import Schedule_Table
 
 class Notice:
     def __init__(self):
-        schedule=Schedule_Table(csv_file_path="csv_data/schedule_2022.csv")
-        self.plan_data=schedule.create_table()
+        schedule = Schedule_Table(csv_file_path = 'csv_data/schedule_2022.csv')
+        self.plan_data = schedule.create_table()
                 
     def run(self):
         set_hour = [x for x in range(24)]
@@ -24,7 +24,7 @@ class Notice:
                     self.display(data)
                 time.sleep(60)
 
-    def display(self,task):
+    def display(self, task):
         for i,s in enumerate(task[:5]):
                 if math.isnan(s):
                     task[i] = None
@@ -34,9 +34,9 @@ class Notice:
         else:
             nt_messege = f'{int(month)}月{int(day)}日{int(hour)}時{int(minute)}分に{data}があります。'
         notification.notify(
-            title = "秘書からのお知らせ",
+            title = '秘書からのお知らせ',
             message = nt_messege,
-            app_name = "秘書チャット",
-            app_icon = "app.ico",
+            app_name = '秘書チャット',
+            app_icon = 'app.ico',
             timeout = 10
         )

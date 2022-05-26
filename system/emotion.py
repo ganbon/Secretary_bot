@@ -1,11 +1,11 @@
 import torch
 from transformers import BertForSequenceClassification,BertJapaneseTokenizer
 def generate(input, max_length = 50):
-    emotion = ['😊','😲','😟','😡','😧','🙂']
+    emotion = ['😊', '😲', '😟', '😡', '😧', '🙂']
     model_path = 'model_emotion'
     tokenizer = BertJapaneseTokenizer.from_pretrained(model_path)
     train_model = BertForSequenceClassification.from_pretrained(model_path, num_labels = 5)
-    data = tokenizer(input,max_length = max_length,truncation = True, padding = "longest", return_tensors = "pt")
+    data = tokenizer(input,max_length = max_length,truncation = True, padding = 'longest', return_tensors = 'pt')
     output = train_model.forward(
         input_ids = data['input_ids'],
         attention_mask = data['attention_mask'],
@@ -18,6 +18,3 @@ def generate(input, max_length = 50):
     else:
         return emotion[5]
     
-#怒ってる…3,驚き…1,寂しい…2,悲しい…4、嬉しい…0
-#s=input()
-#generate(s)
