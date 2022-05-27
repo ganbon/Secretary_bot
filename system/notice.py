@@ -14,6 +14,8 @@ class Notice:
         set_hour = [x for x in range(24)]
         while(1):
             now_date = datetime.now()
+            print(1)
+            time.sleep(2)
             now_month = int(now_date.month)
             now_day = int(now_date.day)
             now_hour = int(now_date.hour)
