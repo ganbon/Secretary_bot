@@ -7,15 +7,13 @@ from system.schedule_data import Schedule_Table
 
 class Notice:
     def __init__(self):
-        schedule = Schedule_Table(csv_file_path = 'csv_data/schedule_2022.csv')
-        self.plan_data = schedule.create_table()
+        self.schedule = Schedule_Table(csv_file_path = 'csv_data/schedule_2022.csv')
                 
     def run(self):
         set_hour = [x for x in range(24)]
         while(1):
+            self.plan_data = self.schedule.create_table()
             now_date = datetime.now()
-            print(1)
-            time.sleep(2)
             now_month = int(now_date.month)
             now_day = int(now_date.day)
             now_hour = int(now_date.hour)
@@ -42,3 +40,4 @@ class Notice:
             app_icon = 'app.ico',
             timeout = 10
         )
+        

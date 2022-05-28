@@ -58,7 +58,7 @@ class Decoder(Discrimination):
                 self.delete_record(record)
                 out = '予定を取り消しました'    
         #urlの内容を抽出して要約
-        elif '抽出' in sentences and re.search(self.url_pattern,self.input) and '要約' in sentences:
+        elif re.search(self.url_pattern,self.input) and '要約' in sentences:
             data_sum = sum(os.path.isfile(os.path.join(self.article_dir, name)) for name in os.listdir(self.article_dir))
             article_path = self.article_dir+'/text_data'+str(data_sum)+'.txt'
             url_oj = re.search(self.url_pattern,self.input)

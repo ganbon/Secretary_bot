@@ -1,5 +1,8 @@
 from system.decoder import Decoder
 from system.template import Template
+import subprocess
+import threading
+import time
 
 class Chat:
     def __init__(self):
@@ -12,6 +15,8 @@ class Chat:
         if tmp_out != None:
             self.tmplate.outputlog_set(tmp_out)
             self.tmplate.log_save()
+            yukkuri_thread = threading.Thread(target = self.yukkuri, args=(tmp_out,))
+            yukkuri_thread.start()
         return log_list
     
     
@@ -24,4 +29,20 @@ class Chat:
         self.tmplate.outputlog_set(output)    
         self.tmplate.log_save()
         log_list = self.tmplate.log_load()
+        yukkuri_thread = threading.Thread(target = self.yukkuri, args=(output,))
+        yukkuri_thread.start()
         return log_list
+    
+    def yukkuri(self, word, active = True):
+        convert_word = {'😊':'えへへへ','😲':'えっほんと？','😟':'寂しいよ','😧':'うわーーん','🙂':'なるほど','😡':'は？'}
+        emotion = ['😊', '😲', '😟', '😡', '😧', '🙂']
+        if word in emotion:
+            word = convert_word[word]
+        _start = 'softalk\\SofTalk.exe'
+        _speed = '/S:100'
+        start_com=[_start, _speed, '/X:1', f'/W:{word}']
+        endcom = ['softalk\\SofTalk.exe','/close_now']
+        if active:
+            start = subprocess.Popen(start_com, shell = True)
+            time.sleep(10)
+            end = subprocess.Popen(endcom, shell = True)
