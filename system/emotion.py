@@ -1,7 +1,7 @@
 import torch
 from transformers import BertForSequenceClassification,BertJapaneseTokenizer
 def generate(input, max_length = 50):
-    emotion = ['😊', '😲', '😟', '😡', '😧', '🙂']
+    emotion = ['😊', '😲', '😞', '😡', '😧', '🙂']
     model_path = 'model/model_emotion'
     tokenizer = BertJapaneseTokenizer.from_pretrained(model_path)
     train_model = BertForSequenceClassification.from_pretrained(model_path, num_labels = 5)

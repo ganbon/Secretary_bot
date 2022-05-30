@@ -19,7 +19,6 @@ class Chat:
             yukkuri_thread.start()
         return log_list
     
-    
     #実装
     def run(self, input):
         log_list = self.tmplate.log_load()    
@@ -34,15 +33,15 @@ class Chat:
         return log_list
     
     def yukkuri(self, word, active = True):
-        convert_word = {'😊':'えへへへ','😲':'えっほんと？','😟':'寂しいよ','😧':'うわーーん','🙂':'なるほど','😡':'は？'}
-        emotion = ['😊', '😲', '😟', '😡', '😧', '🙂']
-        if word in emotion:
+        convert_word = {'😊':'えへへへ','😲':'えっほんと？','😞':'寂しいよ','😧':'うわーーん','🙂':'なるほど','😡':'は？'}
+        if word in convert_word:
             word = convert_word[word]
+        speak = word.replace('\n','')
         _start = 'softalk\\SofTalk.exe'
         _speed = '/S:100'
-        start_com=[_start, _speed, '/X:1', f'/W:{word}']
+        start_com = [_start, _speed, '/X:1', f'/W:{speak}']
         endcom = ['softalk\\SofTalk.exe','/close_now']
         if active:
             start = subprocess.Popen(start_com, shell = True)
-            time.sleep(10)
+            time.sleep(20)
             end = subprocess.Popen(endcom, shell = True)

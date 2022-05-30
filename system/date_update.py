@@ -14,7 +14,8 @@ class Date_Update:
         
 
     # 曖昧な表現を正確な日程に変換                                      
-    def convert(self, sentences):
+    def convert(self, sentences,diff_op = False):
+        diff = -1
         if '来年' in sentences:
             year = self.year+1
             sentences = sentences.replace('来年', str(year))
@@ -24,19 +25,24 @@ class Date_Update:
             day = self.day
             sentences = sentences.replace('今日', f'{year}年{month}月{day}日')
         if '明日' in sentences:
-            year, month, day = self.day_set(1)
+            diff = 1
+            year, month, day = self.day_set(diff)
             sentences = sentences.replace('明日', f'{year}年{month}月{day}日')
         if  '明後日' in sentences:
-            year,month,day = self.day_set(2)
+            diff = 2
+            year,month,day = self.day_set(diff)
             sentences = sentences.replace('明後日', f'{year}年{month}月{day}日')
         if '明々後日' in sentences:
-            year,month,day=self.day_set(3)
+            diff = 3
+            year,month,day = self.day_set(diff)
             sentences=sentences.replace('明々後日', f'{year}年{month}月{day}日')
         if '再来月' in sentences:
-            year,month = self.month_set(2)
+            diff = 2
+            year,month = self.month_set(diff)
             sentences=sentences.replace('再来月', f'{year}年{month}月')
         if '来月' in sentences:
-            year,month = self.month_set(1)
+            diff = 1
+            year,month = self.month_set(diff)
             sentences = sentences.replace('来月', f'{year}年{month}月')
         elif '今月' in sentences:
             year,month = self.year,self.month
@@ -59,8 +65,11 @@ class Date_Update:
         if self.week_list[self.key_week]+'日' in sentences:
             sentences = sentences.replace(self.week_list[self.key_week]+'日', f'{year}年{month}月{self.day}日')
         elif self.week_list[self.key_week] in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week], f'{year}年{month}月{self.day}日')   
-        return sentences
+            sentences = sentences.replace(self.week_list[self.key_week], f'{year}年{month}月{self.day}日')
+        if diff_op:
+            return sentences,diff
+        else:
+            return sentences
                 
     # 日にちの変換
     def day_set(self, diff_num):

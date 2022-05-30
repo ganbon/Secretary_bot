@@ -176,11 +176,12 @@ class Discrimination(Schedule_Table):
         with open('weather_data/localmap_data.pkl', 'rb') as tf:
             localmap_dict = pickle.load(tf)
         area_list = list(localmap_dict.keys())
-        input = self.date_update.convert(input)
+        input, diff_day = self.date_update.convert(input,diff_op = True)
         input_list = self.morpheme(input)
         plan_day = self.date_specify('日', input_list)
-        diff_day = plan_day-self.day
-        if diff_day > 2:
+        if diff_day == -1:
+            diff_day = plan_day-self.day
+        if abs(diff_day) > 2:
             return plan_day,weather_data
         for word in  input_list:
             if word in area_list:
