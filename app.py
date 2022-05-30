@@ -22,7 +22,7 @@ def dated_url_for(endpoint, **values):
 def chat():
     chat = Chat()
     log = chat.start()
-    return render_template("chat.html", chat_text=log)
+    return render_template("chat.html", chat_text = log)
 
 @app.route('/', methods = ['POST'])
 def start_chat():    
