@@ -7,7 +7,7 @@ sub = SubApp()
 root = tk.Tk()
 root.title('秘書チャット')
 root.geometry('350x300')
-root.config(bg='#eaf4fc')
+root.config(bg = '#eaf4fc')
 run_button = tk.Button(root, text = 'アプリ起動', width = 20, font = ('MSゴシック', 17),
                        fg = '#223a70', bg = '#fef4f4', command = lambda:com.app_switch(run_button))
 run_button.pack()
@@ -22,7 +22,7 @@ text_bar_button =  tk.Button(root, text = 'サブアプリ表示', width = 20, f
 notice_button.pack()
 text_bar_button.pack()
 root.iconbitmap(default = 'app.ico')
-pid_list = com.find_process(['app.py','notice_active.py'])
+pid_list = com.find_process([('app.py',1), ('notice_active.py',0)])
 if pid_list['app.py'] != -1:
     run_button.config(bg = '#e6cde3')
     run_button.config(text = 'アプリ停止')

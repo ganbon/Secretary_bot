@@ -22,11 +22,11 @@ class Command:
         self.python_file = subprocess.Popen(command_python, shell = True)
         self.python_file.communicate()
         
-    def quit(self, file_name):
-        pid = self.find_process([file_name])
+    def quit(self, file_name,p_type):
+        pid = self.find_process([(file_name, p_type)])
         if pid[file_name] != -1:
-            command_quit = ['taskkill','/pid',str(pid[1]),'/F']
-            quit = subprocess.Popen(command_quit, shell=True)
+            command_quit = ['taskkill','/pid',str(pid[file_name]),'/F']
+            quit = subprocess.Popen(command_quit, shell = True)
             quit.communicate()
             print('停止しました')
         else:
@@ -37,36 +37,39 @@ class Command:
         pid_list = {}
         pro_list = [proc for proc in psutil.process_iter() if 'python.exe' in str(proc.exe)]
         for name, proc in itertools.product(file_name, pro_list):
-            pid_list[name] = -1;
-            if f'{cwd}\\{name}' in proc.cmdline():
-                pid_list[name] = proc.pid
-            elif 'python.exe' in str(proc.exe) and name in proc.cmdline():
-                pid_list[name] = proc.pid
+            f_name, p_type = name
+            if f'{cwd}\\{f_name}' in proc.cmdline() and p_type == 1:
+                pid_list[f_name] = proc.pid
+            elif f_name in proc.cmdline() and p_type == 0:
+                pid_list[f_name] = proc.pid
+            elif f_name not in pid_list:
+                pid_list[f_name] = -1;
         return pid_list
     
     def app_switch(self, btn):
         run_app_thread = threading.Thread(target = self.run, args = ('app.py',))
-        quit_app_thread = threading.Thread(target = self.quit, args = ('app.py',))
-        self.callback(btn)
+        quit_app_thread = threading.Thread(target = self.quit, args = ('app.py',1))
         if btn.cget('bg') == '#fef4f4':
-            btn.config(text = 'アプリ起動')
-            quit_app_thread.start()
-        else:
-            btn.config(text = 'アプリ停止')
             run_app_thread.start()
+            btn.config(text = 'アプリ起動')
+            self.callback(btn)
+        else:
+            quit_app_thread.start()
+            btn.config(text = 'アプリ停止')
+            self.callback(btn)
         
     def notice_switch(self, btn):
         run_notice_thread = threading.Thread(target = self.run, args = ('notice_active.py',))
-        quit_notice_thread = threading.Thread(target = self.quit, args = ('notice_active.py',))
+        quit_notice_thread = threading.Thread(target = self.quit, args = ('notice_active.py',0))
         if btn.cget('bg') == '#e6cde3':
+            quit_notice_thread.start()
             btn.config(text = '通知ON')
             self.callback(btn)
-            quit_notice_thread.start()
             return   
         else:
+            run_notice_thread.start()
             self.callback(btn)
             btn.config(text = '通知OFF')
-            run_notice_thread.start()
         
     def display_app_clicked(self):
         self.app_thread = threading.Thread(target = self.set_up)
