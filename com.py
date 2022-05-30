@@ -3,13 +3,12 @@ import webbrowser
 import threading
 import psutil
 import os
-import ctypes
+import itertools
 from system.notice import Notice
 
 
 class Command:
     def __init__(self):
-        self.pid_list = []
         self.notice = Notice()
         
     def set_up(self):   
@@ -24,25 +23,25 @@ class Command:
         self.python_file.communicate()
         
     def quit(self, file_name):
-        self.pid_list = self.find_process(file_name)
-        if self.pid_list != []:
-            for p in self.pid_list:
-                command_quit = ['taskkill','/pid',str(p),'/F']
-                quit = subprocess.Popen(command_quit, shell=True)
-                quit.communicate()
-                print('停止しました')
-            self.pid_list = []
+        pid = self.find_process([file_name])
+        if pid[file_name] != -1:
+            command_quit = ['taskkill','/pid',str(pid[1]),'/F']
+            quit = subprocess.Popen(command_quit, shell=True)
+            quit.communicate()
+            print('停止しました')
         else:
             pass
 
-    def find_process(self, file_name):
+    def find_process(self, file_name = []):
         cwd = os.getcwd()
-        pid_list = []
-        for proc in psutil.process_iter():
-            if 'python.exe' in str(proc.exe) and f'{cwd}\\{file_name}' in proc.cmdline():
-                pid_list.append(proc.pid)
-            elif 'python.exe' in str(proc.exe) and file_name in proc.cmdline():
-                pid_list.append(proc.pid)
+        pid_list = {}
+        pro_list = [proc for proc in psutil.process_iter() if 'python.exe' in str(proc.exe)]
+        for name, proc in itertools.product(file_name, pro_list):
+            pid_list[name] = -1;
+            if f'{cwd}\\{name}' in proc.cmdline():
+                pid_list[name] = proc.pid
+            elif 'python.exe' in str(proc.exe) and name in proc.cmdline():
+                pid_list[name] = proc.pid
         return pid_list
     
     def app_switch(self, btn):
