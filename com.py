@@ -51,33 +51,31 @@ class Command:
         quit_app_thread = threading.Thread(target = self.quit, args = ('app.py',1))
         if btn.cget('bg') == '#fef4f4':
             run_app_thread.start()
-            btn.config(text = 'アプリ起動')
-            self.callback(btn)
+            self.callback(btn,'アプリ停止')
         else:
             quit_app_thread.start()
-            btn.config(text = 'アプリ停止')
-            self.callback(btn)
+            self.callback(btn,'アプリ起動')
         
     def notice_switch(self, btn):
         run_notice_thread = threading.Thread(target = self.run, args = ('notice_active.py',))
         quit_notice_thread = threading.Thread(target = self.quit, args = ('notice_active.py',0))
         if btn.cget('bg') == '#e6cde3':
             quit_notice_thread.start()
-            btn.config(text = '通知ON')
-            self.callback(btn)
+            self.callback(btn,'通知ON')
             return   
         else:
             run_notice_thread.start()
-            self.callback(btn)
-            btn.config(text = '通知OFF')
+            self.callback(btn,'通知OFF')
         
     def display_app_clicked(self):
         self.app_thread = threading.Thread(target = self.set_up)
         self.app_thread.start()
     
-    def callback(self, btn):
+    def callback(self, btn, txt):
         current_color = btn.cget('bg')
         if current_color == '#fef4f4':
             btn.config(bg = '#e6cde3')
+            btn.config(text = txt)
         else:
             btn.config(bg = '#fef4f4')
+            btn.config(text = txt)
