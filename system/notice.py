@@ -4,13 +4,15 @@ from plyer import notification
 import pandas as pd
 import time 
 from system.schedule_data import Schedule_Table
+from setting import setting_load
 
 class Notice:
     def __init__(self):
         self.schedule = Schedule_Table(csv_file_path = 'csv_data/schedule_2022.csv')
+        _, _, _, _, self.step = setting_load()
                 
     def run(self):
-        set_hour = [x for x in range(24)]
+        set_hour = [x for x in range(0, 24, int(self.step))]
         while(1):
             self.plan_data = self.schedule.create_table()
             now_date = datetime.now()
@@ -37,7 +39,7 @@ class Notice:
             title = '秘書からのお知らせ',
             message = nt_messege,
             app_name = '秘書チャット',
-            app_icon = 'app.ico',
+            app_icon = '../image/app.ico',
             timeout = 10
         )
         

@@ -5,6 +5,7 @@ from system.schedule import Discrimination
 from system.summany import generate_text_from_model
 import os
 import re
+from setting import setting_load
 from system.text_get import scraping
 from system.emotion import generate
 class Decoder(Discrimination):
@@ -13,8 +14,9 @@ class Decoder(Discrimination):
         self.wakati = MeCab.Tagger('-Owakati')
         self.input = unicodedata.normalize('NFKC', input)
         self.article_dir = 'text_data/'
-        self.map_code='高松'
-        self.url_pattern="https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
+        _, _, _, self.map_code, _ = setting_load()
+        self.map_code = self.map_code.replace('\n','')
+        self.url_pattern = "https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
                 
     #処理決定のための関数
     def decision(self):
@@ -114,7 +116,22 @@ class Decoder(Discrimination):
                     if len(weather_data) > 1:
                         out += '\n'
                 out += 'です。'
+        #日本のTwitterにおける現在のトレンド上位10個を取得
+        elif 'トレンド' in sentences and ('?' in sentences or '教え' in sentences):
+            trends_list = self.twitter_trends_get()
+            out = '現在のトレンドは\n'
+            for t,trend in enumerate(trends_list):
+                t += 1
+                out += f'{t}位:{trend}\n'
+            out += 'です。'
+        elif '起動' in sentences or '開い' in sentences:
+            app_name = sentences[0].lower()
+            flg = self.app_start(app_name)
+            if flg == 1:
+                out = f'{sentences[0]}を起動しました。'
+            else:
+                out = f'起動できませんでした。'
         #該当しない入力の場合のときその言葉に対して感情表現をする
         else:
             out = generate(self.input)
-        return out
+        return out 

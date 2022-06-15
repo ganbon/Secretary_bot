@@ -115,9 +115,3 @@ class Date_Update:
         self.month = month
         return year, month
 
-'''
-d=Date_Update()
-e=input()
-s=d.convert(e)
-print(s)
-'''

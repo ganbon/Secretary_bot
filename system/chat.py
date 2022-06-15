@@ -3,11 +3,13 @@ from system.template import Template
 import subprocess
 import threading
 import time
+from setting import setting_load
 
 class Chat:
     def __init__(self):
         self.tmplate = Template()
-        
+        _, _, self.voice, _, _ = setting_load()
+        self.voice = self.voice.replace('\n','')
     #チャットの初期設定
     def start(self):
         log_list = self.tmplate.log_load()
@@ -28,11 +30,13 @@ class Chat:
         self.tmplate.outputlog_set(output)    
         self.tmplate.log_save()
         log_list = self.tmplate.log_load()
-        yukkuri_thread = threading.Thread(target = self.yukkuri, args=(output,))
-        yukkuri_thread.start()
+        if int(self.voice) == 1:
+            yukkuri_thread = threading.Thread(target = self.yukkuri, args=(output,))
+            yukkuri_thread.start()
         return log_list
     
-    def yukkuri(self, word, active = True):
+    #ゆっくりボイス
+    def yukkuri(self, word):
         convert_word = {'😊':'えへへへ','😲':'えっほんと？','😞':'寂しいよ','😧':'うわーーん','🙂':'なるほど','😡':'は？'}
         if word in convert_word:
             word = convert_word[word]
@@ -41,7 +45,6 @@ class Chat:
         _speed = '/S:100'
         start_com = [_start, _speed, '/X:1', f'/W:{speak}']
         endcom = ['softalk\\SofTalk.exe','/close_now']
-        if active:
-            start = subprocess.Popen(start_com, shell = True)
-            time.sleep(20)
-            end = subprocess.Popen(endcom, shell = True)
+        start = subprocess.Popen(start_com, shell = True)
+        time.sleep(100)
+        end = subprocess.Popen(endcom, shell = True)

@@ -1,13 +1,21 @@
 import MeCab
 import unicodedata
-from datetime import  datetime
+from datetime import datetime
+from psutil import Popen
 from system.date_update import Date_Update
 from system.schedule_data import Schedule_Table
+import re
 import datetime as dt
 import math
+import webbrowser
 import requests
 import pickle
 import random
+import tweepy
+import sys
+sys.path.append('..')
+from twitter.config import *
+
 
 class Discrimination(Schedule_Table):
     def __init__(self, csv_file_path):
@@ -77,9 +85,9 @@ class Discrimination(Schedule_Table):
         for i,s_list in enumerate(schedule_list):
             for j,s in enumerate(s_list[:5]):
                 if math.isnan(s):
-                    schedule_list[i][j]=None
+                    schedule_list[i][j] = None
         input = self.date_update.convert(input)
-        input_list,speech_list = self.morpheme(input,speech=True)
+        input_list,speech_list = self.morpheme(input,speech = True)
         plan_contents = self.content_extract(input_list,speech_list)
         plan_day = self.date_specify('日',input_list)
         plan_month = self.date_specify('月',input_list)
@@ -133,14 +141,17 @@ class Discrimination(Schedule_Table):
         plan = None
         #if day == [] or month == []:
             #return 0
-        plan_table = self.schedule_date[(self.schedule_date['月'] == month) & (self.schedule_date['日'] == day)]
+        plan_table = self.schedule_date[(self.schedule_date['月'] == int(month)) 
+                                        & (self.schedule_date['日'] == int(day))]
         for p in plan_table['予定']:
             if p in input:
                 plan = p
-        record = self.schedule_date[(self.schedule_date['月'] == month) & (self.schedule_date['日'] == day) & (self.schedule_date['予定'] == plan)]
+        record = self.schedule_date[(self.schedule_date['月'] == int(month)) 
+                                    & (self.schedule_date['日'] == int(day)) 
+                                    & (self.schedule_date['予定'] == plan)]
         return record
 
-    #曜日を教えてくれる
+    #曜日の取得
     def week_teach(self,input):
         year = None
         month = None
@@ -168,36 +179,41 @@ class Discrimination(Schedule_Table):
         knowledge = random.choice(knowledge_data)
         return knowledge 
     
-    #天気予報
+    #天気予報表示
     def weather_teach(self, input, area):
         weather_data = []
         diff_day = 0
         plan_day = 0
-        with open('weather_data/localmap_data.pkl', 'rb') as tf:
+        with open('pkl_data/localmap_data.pkl', 'rb') as tf:
             localmap_dict = pickle.load(tf)
         area_list = list(localmap_dict.keys())
-        input, diff_day = self.date_update.convert(input,diff_op = True)
+        input, diff_day = self.date_update.convert(input, diff_op = True)
         input_list = self.morpheme(input)
         plan_day = self.date_specify('日', input_list)
         if diff_day == -1:
             diff_day = plan_day-self.day
         if abs(diff_day) > 2:
-            return plan_day,weather_data
-        for word in  input_list:
+            return plan_day, weather_data
+        try:
+            batch_data = self.weather_get(localmap_dict[area], diff_day,area)
+        except KeyError:
+            return weather_data
+        weather_data.append(batch_data)
+        for word in input_list:
             if word in area_list:
                 map_code = localmap_dict[word]
-                if isinstance(map_code,list):
-                    for area in map_code:
-                        code = localmap_dict[area]
-                        batch_data = self.get_weather(code, diff_day,area)                          
+                if isinstance(map_code, list):
+                    for _area in map_code:
+                        code = localmap_dict[_area]
+                        batch_data = self.weather_get(code, diff_day,_area)                          
                         weather_data.append(batch_data)
                 else: 
-                    batch_data = self.get_weather(map_code, diff_day,word)                          
-                    weather_data.append(batch_data)
+                    batch_data = self.weather_get(map_code, diff_day,word)                          
+                    weather_data.append(batch_data)                   
         return plan_day,weather_data
    
-    
-    def get_weather(self,code,diff_day,word):
+    #天気予報取得
+    def weather_get(self,code,diff_day,word):
         weather_data = []
         url = 'https://weather.tsukumijima.net/api/forecast/city/' + code
         try:  
@@ -211,3 +227,31 @@ class Discrimination(Schedule_Table):
             return weather_data
         except requests.exceptions.RequestException:
             return weather_data
+    
+    #Twitterのトレンド取得
+    def twitter_trends_get(self):
+        auth = tweepy.OAuthHandler(API_Key, API_Sec)
+        auth.set_access_token(Token, Token_Sec)
+        api = tweepy.API(auth)
+        #日本のWOEID
+        woeid = 23424856
+        trends = api.get_place_trends(woeid)
+        trends_list = [t['name'] for t in trends[0]['trends'][:10]]
+        return trends_list
+    
+    #登録したアプリ起動
+    def app_start(self, app_name):
+        with open('pkl_data/app_path_data.pkl', 'rb') as tf:
+            path_dict = pickle.load(tf)
+            url_pattern = "https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
+        if app_name in path_dict:
+            if re.match(url_pattern,path_dict[app_name]):
+                webbrowser.open(path_dict[app_name], 1)
+            else:
+                Popen(path_dict[app_name])       
+            return 1
+        else:
+            return 0
+    
+
+
