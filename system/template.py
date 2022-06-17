@@ -108,7 +108,7 @@ class Template(Schedule_Table):
 
     #google calenderから予定取得
     def google_calender_get(self):
-        schedule_list = self.frame_to_list()
+        schedule_list = self.schedule_data.values.tolist()
         now = datetime.utcnow().isoformat() + 'Z'
         event_list = self.service.events().list(
             calendarId = calendar_id, timeMin = now,
@@ -125,18 +125,18 @@ class Template(Schedule_Table):
             
             if len(date_list) < 4:
                 date_list = [int(x) for x in date_list] 
-                date_list.append(None)
-                date_list.append(None)
+                date_list.append(-1)
+                date_list.append(-1)
             else:
-                date_list = date_list[:6]
+                date_list = date_list[:6]   
                 date_list = [int(x) for x in date_list]
             date_list.append(context)
             if date_list not in schedule_list:
-                self.update_table(date)
+                self.update_table(date_list)
     
     #moodle情報取得
     def moodle_plan(self):
-        schedule_list = self.frame_to_list()
+        schedule_list = self.schedule_data.values.tolist()
         html1, html2 = md.moodel_data()
         now_month = md.extract_html(html1)
         next_month = md.extract_html(html2)
@@ -145,11 +145,3 @@ class Template(Schedule_Table):
             if p not in schedule_list:
                 self.update_table(p)
                 self.google_calender_register(p)
-    
-    def frame_to_list(self):
-        schedule_list = self.schedule_data.values.tolist()
-        for i,s_list in enumerate(schedule_list):
-            for j,s in enumerate(s_list[:5]):
-                if math.isnan(s):
-                    schedule_list[i][j] = None
-        return schedule_list

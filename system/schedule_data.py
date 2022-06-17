@@ -18,7 +18,7 @@ class Schedule_Table:
         gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
         self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
     
-    #チャットログを読み込む
+    #予定データを読み込む
     def create_table(self):
         try:
             df = pd.read_csv(self.csv_file_path, names = self.clumns)
@@ -32,6 +32,7 @@ class Schedule_Table:
 
     #更新
     def update_table(self, update_date):
+        print(update_date)
         self.df.loc[len(self.df)] = update_date
         self.df.to_csv('csv_data/schedule_2022.csv', mode = 'w', index = False, header = False)
         return self.df
@@ -66,7 +67,7 @@ class Schedule_Table:
     #googlecalenderに予定追加
     def google_calender_register(self,plan_data):
         year, month, day, hour, minute, plan = plan_data
-        if hour == None:
+        if hour == -1:
             event= {
                     # 予定のタイトル
                     'summary': plan,

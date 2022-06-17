@@ -30,7 +30,7 @@ class Decoder(Discrimination):
             elif plan_data == -1:
                 out='その予定はすでに登録されています。'
             else:
-                if plan_data[3] == None:
+                if plan_data[3] == -1:
                     out = f'{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日に{plan_data[5]}ですね。覚えておきます。'
                 else:
                     out = f'{plan_data[0]}年{plan_data[1]}月{plan_data[2]}日{plan_data[3]}時{plan_data[4]}分に{plan_data[5]}ですね。覚えておきます。'            

@@ -96,8 +96,8 @@ class Discrimination(Schedule_Table):
         if plan_month == []:
             plan_month = self.month
         if plan_hour == []:
-            plan_hour = None
-            plan_minute = None
+            plan_hour = -1
+            plan_minute = -1
         if plan_hour != [] and plan_minute == []:
             plan_minute = 0
         if plan_day == []:

@@ -35,11 +35,8 @@ class Notice:
                 time.sleep(60)
 
     def display(self, task):
-        for i,s in enumerate(task[:5]):
-                if math.isnan(s):
-                    task[i] = None
         year, month, day, hour,minute,data = task
-        if hour == None:
+        if hour == -1:
             nt_messege = f'{int(month)}月{int(day)}日に{data}の予定があります。'
         else:
             nt_messege = f'{int(month)}月{int(day)}日{int(hour)}時{int(minute)}分に{data}があります。'
