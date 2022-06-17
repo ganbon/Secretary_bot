@@ -125,8 +125,7 @@ class Decoder(Discrimination):
                 out += f'{t}位:{trend}\n'
             out += 'です。'
         elif '起動' in sentences or '開い' in sentences:
-            app_name = sentences[0].lower()
-            flg = self.app_start(app_name)
+            flg = self.app_start(sentences)
             if flg == 1:
                 out = f'{sentences[0]}を起動しました。'
             else:

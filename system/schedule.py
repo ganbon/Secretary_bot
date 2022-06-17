@@ -239,19 +239,28 @@ class Discrimination(Schedule_Table):
         trends_list = [t['name'] for t in trends[0]['trends'][:10]]
         return trends_list
     
+    
+    def app_save(self,app_name,app_path):
+        with open('pkl_data/app_path_data.pkl', 'rb') as tf:
+            path_dict = pickle.load(tf)
+        path_dict[app_name] = app_path
+        with open('app_path_data.pkl','wb') as tf:
+            pickle.dump(path_dict,tf)
+    
     #登録したアプリ起動
-    def app_start(self, app_name):
+    def app_start(self, sentence):
         with open('pkl_data/app_path_data.pkl', 'rb') as tf:
             path_dict = pickle.load(tf)
             url_pattern = "https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
-        if app_name in path_dict:
-            if re.match(url_pattern,path_dict[app_name]):
-                webbrowser.open(path_dict[app_name], 1)
+        for app_name in sentence:
+            if app_name in path_dict:
+                if re.match(url_pattern,path_dict[app_name]):
+                    webbrowser.open(path_dict[app_name], 1)
+                else:
+                    Popen(path_dict[app_name])       
+                return 1
             else:
-                Popen(path_dict[app_name])       
-            return 1
-        else:
-            return 0
+                return 0
     
 
 

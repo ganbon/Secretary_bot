@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time,timedelta
 import math
 from plyer import notification
 import pandas as pd
@@ -16,12 +16,20 @@ class Notice:
         while(1):
             self.plan_data = self.schedule.create_table()
             now_date = datetime.now()
+            period_date = now_date + timedelta(days = 6)
+            period_month = int(period_date.month)
+            period_day = int(period_day)
             now_month = int(now_date.month)
             now_day = int(now_date.day)
             now_hour = int(now_date.hour)
             now_minute = int(now_date.minute)
             if now_hour in set_hour and now_minute == 0:
-                plan_df = self.plan_data[(self.plan_data['月'] >= now_month) & ((self.plan_data['日'] > now_day) | (now_day+7 >self.plan_data['日']))]
+                if now_month == period_month:
+                    plan_df = self.plan_data[(self.plan_data['月'] == now_month) & 
+                                         ((self.plan_data['日'] > now_day) | (period_day > self.plan_data['日']))]
+                else:
+                    plan_df = self.plan_data[((self.plan_data['月'] == now_month) & ((self.plan_data['日'] > now_day))
+                                             | (self.plan_data['月'] == period_month) & ((self.plan_data['日'] < period_day)))]
                 for index,data in plan_df.iterrows():
                     self.display(data)
                 time.sleep(60)
