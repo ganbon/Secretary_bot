@@ -18,43 +18,46 @@
 抽出した情報は`text_data`フォルダに入ってます。
 ## 長文要約
 「要約して (url)」か「要約して (テキストファイルpath)」というメッセージを送信すると要約結果が出力されます。
-:::warning
-長文要約用のモデルはアプリのリポジトリにはありません
-:::
+> 
+> 長文要約用のモデルはアプリのリポジトリにはありません
+> 
 ## 天気予報
 今日を含めた3日間の天気を取得できます。
 「（地域）の明日の天気教えて」などのメッセージでその日の天気、降水確率を取得できます。
 また、 詳細設定の地域欄に自分の住んでいる県名を入れておくと、メッセージ内に地域を入れなくても設定した県の天気予報が取得できます。
 ## Twitterトレンド取得
 「トレンド教えて」とメッセージでじっこうします
-:::warning
-この機能はTwitterAPIの登録が必要です
-:::
+>
+>この機能はTwitterAPIの登録が必要です
+>
 ## Google Calendarとの連携
 登録した予定はGoogle Calendarに自動で登録されます。
 また、Google Calendarから祝日を取得し、登録します。
-:::warning
-この機能はGoogle Calendar APIの有効化、サービスアカウントの生成が必要です。
-:::
+>
+>この機能はGoogle Calendar APIの有効化、サービスアカウントの生成が必>要です。
+>
 ## 豆知識機能
 「豆知識教えて」と送信すると実行されます。
 ## moodle予定取得（学生限定）
 moodle内の予定を自動で取得されます
-:::warning
-ID、passwordをmoodleフォルダの`config.py`に設定する必要があります。  
-また、スクレイピングのためにchromedriver.exeのインストールが必要です。
-:::
+>
+>ID、passwordをmoodleフォルダの`config.py`に設定する必要があります。  
+>また、スクレイピングのためにchromedriver.exeのインストールが必要です。
+>
 
 ## 必要な外部ライブラリ、ツール
 - softalk
-- MeCab
+- MeCab(mecab-python3)
 - tweepy
 - webbrowser
 - requests
 - pandas
 - transformers
--  plyer
--  googleapiclient.discovery
--  google.auth
--  bs4
--  selenium
+- plyer
+- googleapiclient.discovery
+- google.auth
+- bs4
+- selenium
+- flask
+- pillow
+- fugashi 
