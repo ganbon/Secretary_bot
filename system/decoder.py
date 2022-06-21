@@ -8,6 +8,8 @@ import re
 from setting import setting_load
 from system.text_get import scraping
 from system.emotion import generate
+
+
 class Decoder(Discrimination):
     def __init__(self, input, csv_file_path = 'csv_data/schedule_2022.csv'):
         super().__init__(csv_file_path)
@@ -119,6 +121,8 @@ class Decoder(Discrimination):
         #日本のTwitterにおける現在のトレンド上位10個を取得
         elif 'トレンド' in sentences and ('?' in sentences or '教え' in sentences):
             trends_list = self.twitter_trends_get()
+            if trends_list == 0:
+                out = 'キーが登録されてません。'
             out = '現在のトレンドは\n'
             for t,trend in enumerate(trends_list):
                 t += 1

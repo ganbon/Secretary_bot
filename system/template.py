@@ -5,10 +5,9 @@ from system.schedule_data import Schedule_Table
 import googleapiclient.discovery
 import google.auth 
 import sys
-import math
 from setting import setting_load
+from config import *
 sys.path.append('..')
-from key.config import *
 import moodle.data_get as md 
 
 
@@ -27,8 +26,9 @@ class Template(Schedule_Table):
         self.schedule_data = self.create_table()
         self.holiday_df = self.create_holiday()
         self.birth_month, self.birth_day, _, _, _ = setting_load()
-        gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
-        self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
+        if len(key) > 0:
+            gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
+            self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
         
     def log_load(self):
         with open('csv_data/chat_log.csv',mode = 'r',  encoding = 'utf8') as input_f:
@@ -92,7 +92,7 @@ class Template(Schedule_Table):
         try:
             req_holidays = self.service.events().list(calendarId = 'ja.japanese#holiday@group.v.calendar.google.com',
                                                   timeMin = now).execute()
-        except ValueError:
+        except NameError or ValueError:
             return
         holidays = req_holidays['items']
         def get_start_date(holiday):
@@ -110,10 +110,13 @@ class Template(Schedule_Table):
     def google_calender_get(self):
         schedule_list = self.schedule_data.values.tolist()
         now = datetime.utcnow().isoformat() + 'Z'
-        event_list = self.service.events().list(
+        try:
+            event_list = self.service.events().list(
             calendarId = calendar_id, timeMin = now,
             maxResults = 200, singleEvents = True,
             orderBy = 'startTime').execute()
+        except NameError or ValueError:
+            return
         events = event_list.get("items", [])
         for event in events:
             date = event['start'].get('dateTime',event['start'].get('date'))
@@ -122,7 +125,6 @@ class Template(Schedule_Table):
             date = date.replace('T','+')
             date = date.replace(':','-')
             date_list = date.split('-')
-            
             if len(date_list) < 4:
                 date_list = [int(x) for x in date_list] 
                 date_list.append(-1)
@@ -138,6 +140,8 @@ class Template(Schedule_Table):
     def moodle_plan(self):
         schedule_list = self.schedule_data.values.tolist()
         html1, html2 = md.moodel_data()
+        if html1 == 0 or html2 == 0:
+            return
         now_month = md.extract_html(html1)
         next_month = md.extract_html(html2)
         plan = now_month+next_month

@@ -12,9 +12,7 @@ import requests
 import pickle
 import random
 import tweepy
-import sys
-sys.path.append('..')
-from twitter.config import *
+from config import *
 
 
 class Discrimination(Schedule_Table):
@@ -106,6 +104,7 @@ class Discrimination(Schedule_Table):
         if plan_data in schedule_list:
             return -1
         self.schedule_date = self.update_table(plan_data)
+        self.google_calender_register(plan_data,'2')
         return plan_data
     
     #予定の受け渡し
@@ -139,8 +138,6 @@ class Discrimination(Schedule_Table):
         day = self.date_specify('日',input_list)
         month=self.date_specify('月',input_list)
         plan = None
-        #if day == [] or month == []:
-            #return 0
         plan_table = self.schedule_date[(self.schedule_date['月'] == int(month)) 
                                         & (self.schedule_date['日'] == int(day))]
         for p in plan_table['予定']:
@@ -230,6 +227,8 @@ class Discrimination(Schedule_Table):
     
     #Twitterのトレンド取得
     def twitter_trends_get(self):
+        if len(API_Key) < 0 or len(API_Sec) < 0 or len(Token) < 0 or len(Token_Sec) < 0:
+            return 0 
         auth = tweepy.OAuthHandler(API_Key, API_Sec)
         auth.set_access_token(Token, Token_Sec)
         api = tweepy.API(auth)
@@ -261,6 +260,3 @@ class Discrimination(Schedule_Table):
                 return 1
             else:
                 return 0
-    
-
-

@@ -2,9 +2,7 @@ import pandas as pd
 from datetime import datetime
 import googleapiclient.discovery
 import google.auth 
-import sys
-sys.path.append('..')
-from key.config import *
+from config import *
 
 
 class Schedule_Table:
@@ -15,8 +13,9 @@ class Schedule_Table:
         self.df = None
         self.header = False
         self.holiday_df = None
-        gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
-        self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
+        if len(key) > 0:
+            gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
+            self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
     
     #予定データを読み込む
     def create_table(self):
@@ -32,7 +31,6 @@ class Schedule_Table:
 
     #更新
     def update_table(self, update_date):
-        print(update_date)
         self.df.loc[len(self.df)] = update_date
         self.df.to_csv('csv_data/schedule_2022.csv', mode = 'w', index = False, header = False)
         return self.df
@@ -65,12 +63,13 @@ class Schedule_Table:
         self.holiday_df.to_csv('csv_data/holiday.csv', mode = 'w', index = False, header = False)
 
     #googlecalenderに予定追加
-    def google_calender_register(self,plan_data):
+    def google_calender_register(self,plan_data,color = '7'):
         year, month, day, hour, minute, plan = plan_data
         if hour == -1:
             event= {
                     # 予定のタイトル
                     'summary': plan,
+                    'colorId': color,
                     # 予定の開始時刻(ISOフォーマットで指定)
                     'start': {
                         'date': f'{year}-{month}-{day}',
@@ -99,4 +98,7 @@ class Schedule_Table:
                         'timeZone': 'Japan'
                     },
                 }
-        event = self.service.events().insert(calendarId = calendar_id, body = event).execute()
+        try:
+            event = self.service.events().insert(calendarId = calendar_id, body = event).execute()
+        except NameError or ValueError:
+            return
