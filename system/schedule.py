@@ -6,7 +6,6 @@ from system.date_update import Date_Update
 from system.schedule_data import Schedule_Table
 import re
 import datetime as dt
-import math
 import webbrowser
 import requests
 import pickle
@@ -80,10 +79,6 @@ class Discrimination(Schedule_Table):
     #予定の登録
     def schedule_register(self, input):
         schedule_list = self.schedule_date.values.tolist()
-        for i,s_list in enumerate(schedule_list):
-            for j,s in enumerate(s_list[:5]):
-                if math.isnan(s):
-                    schedule_list[i][j] = None
         input = self.date_update.convert(input)
         input_list,speech_list = self.morpheme(input,speech = True)
         plan_contents = self.content_extract(input_list,speech_list)
@@ -237,14 +232,6 @@ class Discrimination(Schedule_Table):
         trends = api.get_place_trends(woeid)
         trends_list = [t['name'] for t in trends[0]['trends'][:10]]
         return trends_list
-    
-    
-    def app_save(self,app_name,app_path):
-        with open('pkl_data/app_path_data.pkl', 'rb') as tf:
-            path_dict = pickle.load(tf)
-        path_dict[app_name] = app_path
-        with open('app_path_data.pkl','wb') as tf:
-            pickle.dump(path_dict,tf)
     
     #登録したアプリ起動
     def app_start(self, sentence):
