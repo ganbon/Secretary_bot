@@ -176,7 +176,7 @@ class Discrimination(Schedule_Table):
         weather_data = []
         diff_day = 0
         plan_day = 0
-        with open('pkl_data/localmap_data.pkl', 'rb') as tf:
+        with open('pickle_data/localmap_data.pkl', 'rb') as tf:
             localmap_dict = pickle.load(tf)
         area_list = list(localmap_dict.keys())
         input, diff_day = self.date_update.convert(input, diff_op = True)
@@ -235,7 +235,7 @@ class Discrimination(Schedule_Table):
     
     #登録したアプリ起動
     def app_start(self, sentence):
-        with open('pkl_data/app_path_data.pkl', 'rb') as tf:
+        with open('pickle_data/app_path_data.pkl', 'rb') as tf:
             path_dict = pickle.load(tf)
             url_pattern = "https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
         for app_name in sentence:
