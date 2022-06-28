@@ -122,16 +122,12 @@ class Discrimination(Schedule_Table):
         teach_data = data[(data['月'] == teach_month) & (data['日'] == teach_day) & (data['年'] == teach_year)]
         return teach_month,teach_day,teach_data
     
-    #予定の取り消し
-    def delete_record(self, del_record):
-        return super().delete_record(del_record)
-    
     #特定のレコード取り出し   
     def schedule_get(self,input):
         input = self.date_update.convert(input)
         input_list = self.morpheme(input)
         day = self.date_specify('日',input_list)
-        month=self.date_specify('月',input_list)
+        month = self.date_specify('月',input_list)
         plan = None
         plan_table = self.schedule_date[(self.schedule_date['月'] == int(month)) 
                                         & (self.schedule_date['日'] == int(day))]
