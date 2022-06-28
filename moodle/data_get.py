@@ -6,6 +6,10 @@ from datetime import datetime
 import re
 import unicodedata
 def moodel_data():
+    html1 = 0
+    html2 = 0
+    if len(USER) < 0 or len(PASS) < 0:
+        return html1,html2
     options = webdriver.ChromeOptions()
     driver = webdriver.Chrome(executable_path = driver_path, chrome_options = options)
     driver.get('https://kadai-moodle.kagawa-u.ac.jp/login/index.php') #moodleのログインurl
@@ -30,6 +34,7 @@ def extract_html(html):
     mat = [] 
     now_date = datetime.now()
     day = int(now_date.day)
+    year = int(now_date.year)
     soup = BeautifulSoup(html, 'html.parser')
     table = soup.find('table')
     r = []
@@ -57,13 +62,14 @@ def extract_html(html):
     for data in text_list:
         if 'イベントなし' in data:
             continue
-        elif '2022年' in data:
+        elif f'{year}年' in data:
             date = []
             date = data.split('.')[2:]
             date = [int(re.sub(r"\D", "", x)) for x in date]
+            date += [-1,-1]
             if date[2] < day:
+                date = []
                 continue 
-            date += [None,None]
         elif date != [] and len(set(data)) > 3:
             d = copy(date)
             data = data.replace('.',' ')
@@ -73,6 +79,6 @@ def extract_html(html):
                 context = unicodedata.normalize('NFKC', context)
                 d.append(context)
             else:
-                d.append(data)
+                d.append(str(data))
             plan_data.append(d)
     return plan_data
