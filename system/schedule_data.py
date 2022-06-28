@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 import googleapiclient.discovery
 import google.auth 
-from config import *
+from  config import *
 
 
 class Schedule_Table:
@@ -17,7 +17,7 @@ class Schedule_Table:
             gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
             self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
     
-    #予定データを読み込む
+    #予定フレーム作成
     def create_table(self):
         try:
             df = pd.read_csv(self.csv_file_path, names = self.clumns)
@@ -49,6 +49,7 @@ class Schedule_Table:
             self.df.drop(index,inplace = True)
         self.df.to_csv('csv_data/schedule_2022.csv', mode = 'w', index = False, header = False)
     
+    #祝日のフレーム作成
     def create_holiday(self):
         try:
             self.holiday_df = pd.read_csv('csv_data/holiday.csv', names = self.hol_clumns)
@@ -58,6 +59,7 @@ class Schedule_Table:
             self.holiday_df.astype = {'年':int,'月':int,'日':int,"内容":str}
         return self.holiday_df
     
+    #祝日の更新
     def update_holiday(self,update_data):
         self.holiday_df.loc[len(self.holiday_df)] = update_data
         self.holiday_df.to_csv('csv_data/holiday.csv', mode = 'w', index = False, header = False)
@@ -87,14 +89,15 @@ class Schedule_Table:
             event= {
                     # 予定のタイトル
                     'summary': plan,
+                    'colorId': color,
                     # 予定の開始時刻(ISOフォーマットで指定)
                     'start': {
-                        'date': f'{year}-{month}-{day}-{start_hour}-{minute}',
+                        'dateTime': datetime(year, month, day, start_hour, minute).isoformat(),
                         'timeZone': 'Japan'
                     },
                     # 予定の終了時刻(ISOフォーマットで指定)
                     'end': {
-                        'date': f'{year}-{month}-{day}-{end_hour}-{minute}',
+                        'dateTime': datetime(year, month, day, end_hour, minute).isoformat(),
                         'timeZone': 'Japan'
                     },
                 }
