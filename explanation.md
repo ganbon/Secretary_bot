@@ -44,20 +44,3 @@ moodle内の予定を自動で取得されます
 >ID、passwordをmoodleフォルダの`config.py`に設定する必要があります。  
 >また、スクレイピングのためにchromedriver.exeのインストールが必要です。
 >
-
-## 必要な外部ライブラリ、ツール
-- softalk
-- MeCab(mecab-python3)
-- tweepy
-- webbrowser
-- requests
-- pandas
-- transformers
-- plyer
-- googleapiclient.discovery
-- google.auth
-- bs4
-- selenium
-- flask
-- pillow
-- fugashi 
