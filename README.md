@@ -7,7 +7,7 @@
 
 ## 仮想環境配布
 conda_env の`conda_env.yml`に Anaconda 環境構築ファイルを配布しています。
-構築手順は以下のとおりです
+構築手順は以下のとおりです  
 - conda_envにある`edit_envpath.py`を実行
 - コマンド`conda env create -f conda_env.yml`を実行
 
@@ -36,9 +36,8 @@ conda_env の`conda_env.yml`に Anaconda 環境構築ファイルを配布して
 - 通知機能
 - Twitter トレンド提示機能[^3]
 - Moodle の予定取得(学生限定)
-- Google Calendar との連携[^4]
-  各機能の詳しい使用方法は「explanation.md」を御覧ください。  
-  また各種必要なライブラリは各自でインストールお願いします。
+- Google Calendar との連携[^4]  
+  各機能の詳しい使用方法は「explanation.md」を御覧ください。また各種必要なライブラリは各自でインストールお願いします。
 
 [^1]:
     この機能はこちらのリポジトリのプログラムでモデルの生成実装が必要です。  
