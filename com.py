@@ -15,7 +15,7 @@ class Command:
         webbrowser.open('http://127.0.0.1:5000/', 1)
 
     def run(self ,file_name):
-        command_anaconda = ['activate', 'deep']
+        command_anaconda = ['activate', 'bot-env']
         command_python = ['python', file_name]    
         anaconda = subprocess.Popen(command_anaconda, shell = True)
         anaconda.communicate()
