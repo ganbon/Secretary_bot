@@ -14,14 +14,14 @@ class Notice:
         while(1):
             self.plan_data = self.schedule.create_table()
             now_date = datetime.now()
-            period_date = now_date + timedelta(days = 6)
+            period_date = now_date + timedelta(days = 7)
             period_month = int(period_date.month)
             period_day = int(period_date.day)
             now_month = int(now_date.month)
             now_day = int(now_date.day)
             now_hour = int(now_date.hour)
             now_minute = int(now_date.minute)
-            if now_hour in set_hour and now_minute == 6:
+            if now_hour in set_hour and now_minute == 0:
                 if now_month == period_month:
                     plan_df = self.plan_data[(self.plan_data['月'] == now_month) & 
                                          ((self.plan_data['日'] > now_day) | (period_day > self.plan_data['日']))]
