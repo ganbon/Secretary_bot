@@ -31,18 +31,18 @@ html {
   .bms_message {
       margin: 0px;
       padding: 0 14px;/*吹き出しがタイムラインの側面にひっつかない様に隙間を開ける*/
-      font-size: 16px;
+      font-size: 10px;
       word-wrap: break-word;/* 吹き出し内で自動で改行 */
       white-space: normal;/*指定widthに合わせて、文字を自動的に改行*/
   }
   .bms_message_box{
-    margin-top: 20px;/*上下の吹き出しがひっつかない様に隙間を入れる*/
+    margin-top: 15px;/*上下の吹き出しがひっつかない様に隙間を入れる*/
     max-width: 100%;/*文字が長くなった時に吹き出しがタイムラインからはみ出さない様にする*/
-    font-size: 16px;
+    font-size: 10px;
 }
 
     .bms_message_content{
-        padding: 20px;/*文字や画像（コンテンツ）の外側に隙間を入れる*/
+        padding: 15px;/*文字や画像（コンテンツ）の外側に隙間を入れる*/
     }
 
 /* メッセージ１（左側） */
