@@ -28,7 +28,7 @@ class Command:
             command_quit = ['taskkill','/pid',str(pid[file_name]),'/F']
             quit = subprocess.Popen(command_quit, shell = True)
             quit.communicate()
-            print('停止しました')
+            #print('停止しました')
         else:
             pass
 
