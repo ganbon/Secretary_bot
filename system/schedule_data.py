@@ -2,10 +2,11 @@ import pandas as pd
 from datetime import datetime
 import googleapiclient.discovery
 import google.auth 
-from  config import *
+import base64
+from system.config import *
 
 
-class Schedule_Table:
+class ScheduleTable:
     def __init__(self, csv_file_path):
         self.csv_file_path = csv_file_path
         self.clumns = ['年','月','日','時','分','予定']
@@ -48,6 +49,7 @@ class Schedule_Table:
         for index,data in del_record.iterrows():
             self.df.drop(index,inplace = True)
         self.df.to_csv('csv_data/schedule_2022.csv', mode = 'w', index = False, header = False)
+        return self.df
     
     #祝日のフレーム作成
     def create_holiday(self):
@@ -105,3 +107,33 @@ class Schedule_Table:
             event = self.service.events().insert(calendarId = calendar_id, body = event).execute()
         except NameError or ValueError:
             return
+        
+    #googlecalenderの予定削除
+    def google_calender_delate(self,plan_data):
+        plan_list = plan_data.values.tolist()[0]
+        year, month, day, hour, minute, plan = plan_list
+        now = datetime.utcnow().isoformat() + 'Z'
+        try:
+            event_list = self.service.events().list(
+                calendarId = calendar_id, timeMin = now,
+                maxResults = 200, singleEvents = True,
+                orderBy = 'startTime').execute()
+        except NameError or ValueError:
+            return 0
+        events = event_list.get("items", [])
+        for event in events:
+            date = event['start'].get('dateTime',event['start'].get('date'))
+            context = event['summary']
+            if plan == context:
+                date = date.replace('T','-')
+                date = date.replace(':','-')
+                date_list = date.split('-')
+                date_list = [int(x) for x in date_list]
+                if date_list[0] == year and date_list[1] == month and date_list[2] == day:
+                    event_id = event['htmlLink'].split('?eid=')[-1].encode(encoding='utf-8')
+                    event_id += b"=" * ((4 - len(event_id) % 4) % 4)
+                    event_id = base64.b64decode(event_id).decode()
+                    event_id = event_id.split(' ')[0]
+                    event = self.service.events().delete(calendarId = calendar_id,eventId = event_id).execute()
+            else:
+                continue

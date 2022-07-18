@@ -1,14 +1,15 @@
 from datetime import datetime, time,timedelta
 from plyer import notification
 import time 
-from system.schedule_data import Schedule_Table
+from system.schedule_data import ScheduleTable
 from setting import setting_load
 
 class Notice:
     def __init__(self):
-        self.schedule = Schedule_Table(csv_file_path = 'csv_data/schedule_2022.csv')
+        self.schedule = ScheduleTable(csv_file_path = 'csv_data/schedule_2022.csv')
         _, _, _, _, self.step = setting_load()
-                
+    
+    #実装      
     def run(self):
         set_hour = [x for x in range(0, 24, int(self.step))]
         while(1):
@@ -31,7 +32,8 @@ class Notice:
                 for index,data in plan_df.iterrows():
                     self.display(data)
                 time.sleep(60)
-
+                
+    #通知表示
     def display(self, task):
         year, month, day, hour,minute,data = task
         if hour == -1:

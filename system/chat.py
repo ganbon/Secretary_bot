@@ -17,8 +17,9 @@ class Chat:
         if tmp_out != None:
             self.tmplate.outputlog_set(tmp_out)
             self.tmplate.log_save()
-            yukkuri_thread = threading.Thread(target = self.yukkuri, args=(tmp_out,))
-            yukkuri_thread.start()
+            if int(self.voice) == 1:
+                yukkuri_thread = threading.Thread(target = self.yukkuri, args=(tmp_out,))
+                yukkuri_thread.start()
         return log_list
     
     #実装

@@ -1,17 +1,15 @@
 import csv
 from datetime import datetime
 import pandas as pd
-from system.schedule_data import Schedule_Table
+from system.schedule_data import ScheduleTable
 import googleapiclient.discovery
 import google.auth 
-import sys
+import system.data_get as md
 from setting import setting_load
-from config import *
-sys.path.append('..')
-import moodle.data_get as md 
+from system.config import * 
 
 
-class Template(Schedule_Table):
+class Template(ScheduleTable):
     def __init__(self):
         super().__init__(csv_file_path = 'csv_data/schedule_2022.csv')
         self.log = None
@@ -29,24 +27,29 @@ class Template(Schedule_Table):
         if len(key) > 0:
             gapi_creds = google.auth.load_credentials_from_file(key, SCOPES)[0]
             self.service = googleapiclient.discovery.build('calendar', 'v3', credentials = gapi_creds)
-        
+    
+    #チャットログ読み取り
     def log_load(self):
         with open('csv_data/chat_log.csv',mode = 'r',  encoding = 'utf8') as input_f:
             log = csv.reader(input_f)
             self.log_list = [o for o in log]
         return self.log_list
-            
+    
+    #チャットログ保存
     def log_save(self):
         with open('csv_data/chat_log.csv',mode = 'w', encoding = 'utf8', newline = '') as input_f:
             write = csv.writer(input_f)
             write.writerows(self.log_list) 
 
+    #ユーザログ更新
     def inputlog_set(self,input):
         self.log_list.append([self.year, self.month, self.day, self.hour, self.minute, 'enc', input])
 
+    #ボットログ更新
     def outputlog_set(self,output):
         self.log_list.append([self.year, self.month, self.day, self.hour, self.minute, 'dec', output])
-        
+    
+    #チャット起動時の処理
     def start_chat(self):
         date_csv_data = [date[:3] for date in self.log_list]
         date_csv_data = [[int(d) for d in date] for date in date_csv_data]
@@ -54,14 +57,14 @@ class Template(Schedule_Table):
         self.google_calender_get()
         if [self.year,self.month,self.day] not in date_csv_data or date_csv_data == []:
             self.moodle_plan()
-            if self.hour < 12:
+            if  5 < self.hour < 12:
                 out = 'おはようございます。'
-            elif self.hour < 18:
+            elif 11 < self.hour < 18:
                 out = 'こんにちは。'
             else:
                 out = 'こんばんは。'
             out += f'今日は{self.year}年{self.month}月{self.day}日{self.week}。\n'
-            holiday = self.holiday_df[(self.holiday_df['月'] == self.month) & 
+            holiday = self.holiday_df['内容'][(self.holiday_df['月'] == self.month) & 
                                       (self.holiday_df['日'] == self.day) & 
                                       (self.holiday_df['年'] == self.year)]
             if holiday.empty:
@@ -69,7 +72,7 @@ class Template(Schedule_Table):
             else:
                 for h in holiday:
                     out+=f"{h}です。\n"
-            if self.month==int(self.birth_month) and self.day==int(self.birth_day):
+            if self.month == int(self.birth_month) and self.day == int(self.birth_day):
                 out+='誕生日おめでとうございます🎂\n'
             out+= '今日の予定は'
             teach_csv_data = self.schedule_data[(self.schedule_data['月'] == self.month) & 
@@ -87,7 +90,7 @@ class Template(Schedule_Table):
     
     #祝日取得
     def holiday_date(self):
-        holiday_list = self.holiday_df.values.tolist()
+        holiday_list = self.holiday_df.values.tolist() 
         now = datetime.utcnow().isoformat() + 'Z'
         try:
             req_holidays = self.service.events().list(calendarId = 'ja.japanese#holiday@group.v.calendar.google.com',
@@ -95,8 +98,11 @@ class Template(Schedule_Table):
         except NameError or ValueError:
             return
         holidays = req_holidays['items']
+        
+        #祝日取り出し
         def get_start_date(holiday):
             return holiday['start']['date']
+        
         holidays.sort(key = get_start_date)
         for holiday in holidays:
             date = holiday['start']['date'].split('-')
@@ -112,9 +118,9 @@ class Template(Schedule_Table):
         now = datetime.utcnow().isoformat() + 'Z'
         try:
             event_list = self.service.events().list(
-            calendarId = calendar_id, timeMin = now,
-            maxResults = 200, singleEvents = True,
-            orderBy = 'startTime').execute()
+                calendarId = calendar_id, timeMin = now,
+                maxResults = 200, singleEvents = True,
+                orderBy = 'startTime').execute()
         except NameError or ValueError:
             return
         events = event_list.get("items", [])
@@ -122,7 +128,6 @@ class Template(Schedule_Table):
             date = event['start'].get('dateTime',event['start'].get('date'))
             context = event['summary']
             date = date.replace('T','-')
-            date = date.replace('T','+')
             date = date.replace(':','-')
             date_list = date.split('-')
             if len(date_list) < 4:
@@ -130,10 +135,9 @@ class Template(Schedule_Table):
                 date_list.append(-1)
                 date_list.append(-1)
             else:
-                date_list = date_list[:6]   
-                date_list = [int(x) for x in date_list]
+                date_list = [int(x) for x in date_list[:5]]
             date_list.append(context)
-            if date_list not in schedule_list:
+            if date_list not in schedule_list:  
                 self.update_table(date_list)
     
     #moodle情報取得

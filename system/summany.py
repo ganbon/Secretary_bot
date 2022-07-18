@@ -1,6 +1,7 @@
-
 from transformers import T5Tokenizer,T5ForConditionalGeneration
-def generate_text_from_model(text_file, max_length_src = 700, max_length_target = 70, num_return_sequences = 1):
+
+
+def generate_text_from_model(text_file, max_length_src = 700, max_length_target = 70, num_return_sequences = 3):
     model_path = 'model/model_summany'
     tokenizer = T5Tokenizer.from_pretrained(model_path)
     with open(text_file,'r',encoding='UTF-8') as f:
@@ -15,6 +16,3 @@ def generate_text_from_model(text_file, max_length_src = 700, max_length_target 
 
     generated_texts = [tokenizer.decode(ids, skip_special_tokens = True, clean_up_tokenization_spaces = False) for ids in outputs]
     return generated_texts
-'''
-print(generate_text_from_model('b.txt'))
-'''

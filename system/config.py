@@ -1,10 +1,11 @@
-#Google calendar APIに関するパラメータ
-SCOPES = ['https://www.googleapis.com/auth/calendar'] 
+USER = '' #moodleのId
+PASS = '' #moodleのpassword
+driver_path = '' #Chromeドライバーのpath
+#TwitterAPIの各種キー
+API_Key     = ""
+API_Sec     = ""
+Token       = ""
+Token_Sec   = ""
+SCOPES = [''] #カレンダーのURL
 calendar_id = '' #google calendar ID
 key = '' #keyのjsonファイルのpath
-
-#Twitter APIに関するパラメータ
-API_Key     = "" #api_key 
-API_Sec     = "" #api_security_key
-Token       = "" #api_token
-Token_Sec   = "" #token_security

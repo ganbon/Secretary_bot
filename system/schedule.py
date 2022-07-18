@@ -1,91 +1,79 @@
-import MeCab
-import unicodedata
+from nlptoolsjp.morpheme import morpheme
+from nlptoolsjp.file_system import file_load
 from datetime import datetime
 from psutil import Popen
 from system.date_update import Date_Update
-from system.schedule_data import Schedule_Table
+from system.schedule_data import ScheduleTable
 import re
 import datetime as dt
 import webbrowser
 import requests
-import pickle
 import random
 import tweepy
-from config import *
+from system.config import *
 
 
-class Discrimination(Schedule_Table):
-    def __init__(self, csv_file_path):
+class Discrimination(ScheduleTable):
+    def __init__(self, csv_file_path):  
         super().__init__(csv_file_path)
         self.schedule_date = self.create_table()
-        self.wakati = MeCab.Tagger('-Owakati')
         self.date_update = Date_Update()
-        now_date = datetime.now()
-        self.year = int(now_date.year)
-        self.month = int(now_date.month)
-        self.day = int(now_date.day)
+        self.now_date = datetime.now()
+        self.year = int(self.now_date.year)
+        self.month = int(self.now_date.month)
+        self.day = int(self.now_date.day)
         self.week_list = ['月曜日','火曜日','水曜日','木曜日','金曜日','土曜日','日曜日']
         self.date_key = ['年','月','日','時','分']
         self.week = self.week_list[datetime.today().weekday()]
-        self.hour = int(now_date.hour)
-        self.minute = int(now_date.minute)
-
-    #形態素解析
-    def morpheme(self, input, speech=False):
-        input = unicodedata.normalize('NFKC', input)
-        if speech:
-            speech_list = []
-            sentence = self.wakati.parse(input).split()
-            node = self.wakati.parseToNode(input)
-            while node:
-                if node.feature.split(',')[0] != 'BOS/EOS':
-                    speech_list.append(node.feature.split(',')[0])    
-                node = node.next
-            return sentence,speech_list
-        else:
-            sentence = self.wakati.parse(input).split()
-            return sentence   
+        self.hour = int(self.now_date.hour)
+        self.minute = int(self.now_date.minute)   
         
     #予定の内容抽出
-    def content_extract(self, input_list, speech_list):
-        out_list = []
+    def content_extract(self, input_dict):
+        output_list = []
+        sentences = list(input_dict.keys())
+        speech_list = list(input_dict.values())
         ban_word = ['覚え','記憶']
         pass_word = ['予定','こと']
-        for i,input in enumerate(input_list):
-            if input in ban_word:
+        for i,sentence in enumerate(sentences):
+            if sentence in ban_word:
                 break
-            elif input in pass_word:
+            elif sentence in pass_word:
                 continue
-            elif input.isdecimal() and input_list[i+1] in self.date_key:
+            elif sentence.isdecimal() and sentences[i+1] in self.date_key:
                 continue
-            elif (input_list[i-1]).isdecimal() and input in self.date_key:
+            elif sentences[i-1].isdecimal() and sentence in self.date_key:
                 continue
-            elif out_list != [] and speech_list[i-1] == '名詞' and speech_list[i+1] == '名詞' and input_list[i+1] not in pass_word:
-                out_list.append(input_list[i])
-            elif speech_list[i] == '名詞':
-                out_list.append(input)
+            elif output_list != [] and speech_list[i-1]['speech'] == speech_list[i+1]['speech'] == '名詞' and sentences[i+1] not in pass_word:
+                output_list.append(sentence)
+            elif speech_list[i]['speech'] == '名詞':
+                output_list.append(sentence)
             else:
                 continue
-        return ''.join(out_list)                
+        return ''.join(output_list)                
         
     #文章内の日程の取り出し
-    def date_specify(self, date_kind, input_list):
-        data = [input_list[i-1] for i,x in enumerate(input_list) if x == date_kind and input_list[i-1].isdecimal()]
+    def date_specify(self, date_kind, input_dict):
+        if type(input_dict) is dict: 
+            key_list = list(input_dict.keys())
+        else:
+            key_list = input_dict
+        data = [key_list[i-1] for i,key in enumerate(key_list) if key == date_kind and key_list[i-1].isdecimal()]
         if data == []:
             return data
         else:
             return int(data[0])
     
     #予定の登録
-    def schedule_register(self, input):
+    def schedule_register(self, message):
         schedule_list = self.schedule_date.values.tolist()
-        input = self.date_update.convert(input)
-        input_list,speech_list = self.morpheme(input,speech = True)
-        plan_contents = self.content_extract(input_list,speech_list)
-        plan_day = self.date_specify('日',input_list)
-        plan_month = self.date_specify('月',input_list)
-        plan_hour = self.date_specify('時',input_list)
-        plan_minute = self.date_specify('分',input_list)
+        message = self.date_update.convert(message)
+        input_dict = morpheme(message,kind = True)
+        plan_contents = self.content_extract(input_dict)
+        plan_day = self.date_specify('日',input_dict)
+        plan_month = self.date_specify('月',input_dict)
+        plan_hour = self.date_specify('時',input_dict)
+        plan_minute = self.date_specify('分',input_dict)
         if plan_month == []:
             plan_month = self.month
         if plan_hour == []:
@@ -103,58 +91,67 @@ class Discrimination(Schedule_Table):
         return plan_data
     
     #予定の受け渡し
-    def schedule_teach(self, input):
-        input = self.date_update.convert(input)
-        input_list = self.morpheme(input,speech = False)
+    def schedule_teach(self, message):
+        message = self.date_update.convert(message)
+        sentences = morpheme(message, kind = False)
         teach_year = self.year
         teach_day = None
         data = self.schedule_date
-        if '月' in input_list and '日' not in input_list:
-            teach_month = self.date_specify('月',input_list)
+        if '月' in sentences and '日' not in sentences:
+            teach_month = self.date_specify('月',sentences)
             teach_data = data[(data['月'] == teach_month) & (data['年'] == teach_year)]
             return teach_month,teach_day,teach_data
-        elif '日' in input_list and '月' not in input_list:
-            teach_day = self.date_specify('日',input_list)
+        elif '日' in sentences and '月' not in sentences:
+            teach_day = self.date_specify('日',sentences)
             teach_month = self.month
-        elif '日' in input_list and '月' in input_list:
-            teach_month = self.date_specify('月',input_list)
-            teach_day = self.date_specify('日',input_list)
+        elif '日' in sentences and '月' in sentences:
+            teach_month = self.date_specify('月',sentences)
+            teach_day = self.date_specify('日',sentences)
         teach_data = data[(data['月'] == teach_month) & (data['日'] == teach_day) & (data['年'] == teach_year)]
         return teach_month,teach_day,teach_data
     
     #特定のレコード取り出し   
-    def schedule_get(self,input):
-        input = self.date_update.convert(input)
-        input_list = self.morpheme(input)
-        day = self.date_specify('日',input_list)
-        month = self.date_specify('月',input_list)
+    def schedule_get(self,message):
+        message = self.date_update.convert(message)
+        sentences = morpheme(message)
+        day = self.date_specify('日',sentences)
+        if day == []:
+            day = self.day 
+        month = self.date_specify('月',sentences)
+        if month == []:
+            month = self.month
         plan = None
         plan_table = self.schedule_date[(self.schedule_date['月'] == int(month)) 
                                         & (self.schedule_date['日'] == int(day))]
         for p in plan_table['予定']:
-            if p in input:
+            if p in message:
                 plan = p
         record = self.schedule_date[(self.schedule_date['月'] == int(month)) 
                                     & (self.schedule_date['日'] == int(day)) 
                                     & (self.schedule_date['予定'] == plan)]
         return record
-
+    
+    #予定の削除
+    def schedule_delete(self, del_record):
+        self.google_calender_delate(del_record)
+        self.schedule_date = self.delete_record(del_record)
+    
     #曜日の取得
     def week_teach(self,input):
         year = None
         month = None
         day = None
         input = self.date_update.convert(input)
-        input_list = self.morpheme(input)
-        if '年' in input_list:
-            year = self.date_specify('年', input_list)
+        sentences = morpheme(input)
+        if '年' in sentences:
+            year = self.date_specify('年', sentences)
         else:
             year = self.year
-        if '月' in input_list:
-            month = self.date_specify('月', input_list)
+        if '月' in sentences:
+            month = self.date_specify('月', sentences)
         else:
             month = self.month
-        day = self.date_specify('日',  input_list)
+        day = self.date_specify('日', sentences)
         d_key = dt.date(year,month,day)
         week_key = d_key.weekday()
         return year,month,day,self.week_list[week_key]
@@ -162,32 +159,26 @@ class Discrimination(Schedule_Table):
     #豆知識をランダムにわたす  
     def knowledge_teach(self):
         file_path = 'text_data/min_kl.txt'
-        with open(file_path,'r',encoding = 'UTF-8') as f:
-            knowledge_data = f.readlines()
+        knowledge_data = file_load(file_path)
         knowledge = random.choice(knowledge_data)
         return knowledge 
     
     #天気予報表示
-    def weather_teach(self, input, area):
+    def weather_teach(self, messege, area):
         weather_data = []
         diff_day = 0
         plan_day = 0
-        with open('pickle_data/localmap_data.pkl', 'rb') as tf:
-            localmap_dict = pickle.load(tf)
+        localmap_dict = file_load(file_path = 'json_data/localmap_data.json')
         area_list = list(localmap_dict.keys())
-        input, diff_day = self.date_update.convert(input, diff_op = True)
-        input_list = self.morpheme(input)
-        plan_day = self.date_specify('日', input_list)
-        if diff_day == -1:
-            diff_day = plan_day-self.day
-        if abs(diff_day) > 2:
+        messege, diff_day = self.date_update.convert(messege, diff_op = True)
+        input_dict = morpheme(messege)
+        plan_day = self.date_specify('日', input_dict)
+        if abs(diff_day) > 2 or (plan_day == [] and diff_day != -1):
             return plan_day, weather_data
-        try:
-            batch_data = self.weather_get(localmap_dict[area], diff_day,area)
-        except KeyError:
-            return weather_data
-        weather_data.append(batch_data)
-        for word in input_list:
+        if diff_day == -1:
+            diff_day = 0
+            plan_day = self.day
+        for word in input_dict:
             if word in area_list:
                 map_code = localmap_dict[word]
                 if isinstance(map_code, list):
@@ -196,8 +187,15 @@ class Discrimination(Schedule_Table):
                         batch_data = self.weather_get(code, diff_day,_area)                          
                         weather_data.append(batch_data)
                 else: 
-                    batch_data = self.weather_get(map_code, diff_day,word)                          
-                    weather_data.append(batch_data)                   
+                    batch_data = self.weather_get(map_code, diff_day, word)                          
+                    weather_data.append(batch_data)
+        #print(weather_data)
+        if weather_data == []:
+            try:
+                batch_data = self.weather_get(localmap_dict[area], diff_day,area)
+                weather_data.append(batch_data)
+            except KeyError:
+                return weather_data        
         return plan_day,weather_data
    
     #天気予報取得
@@ -231,9 +229,8 @@ class Discrimination(Schedule_Table):
     
     #登録したアプリ起動
     def app_start(self, sentence):
-        with open('pickle_data/app_path_data.pkl', 'rb') as tf:
-            path_dict = pickle.load(tf)
-            url_pattern = "https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
+        path_dict = file_load(file_path='json_data/app_path_data.json')
+        url_pattern = "https?://[\w!?/+\-_~;.,*&@#$%()'[\]]+"
         for app_name in sentence:
             if app_name in path_dict:
                 if re.match(url_pattern,path_dict[app_name]):

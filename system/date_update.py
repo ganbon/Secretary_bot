@@ -1,112 +1,72 @@
-from datetime import datetime
+from datetime import datetime,timedelta
+from nlptoolsjp.morpheme import morpheme
 
 
 class Date_Update:
     def __init__(self):
-        now_date = datetime.now()
+        self.now_date = datetime.now()
         self.week_list = ['月曜', '火曜', '水曜', '木曜', '金曜', '土曜', '日曜']
+        self.keyword_year = {"来年":1}
+        self.keyword_day = {'今日':0,'明日':1,'明後日':2,'明々後日':3}
+        self.keyword_month ={'今月':0,'来月':1,'再来月':2}
+        self.keyword_week = {'今週':0,'来週':7,'再来週':14}
         self.week = datetime.today().weekday()
-        self.year = int(now_date.year)
-        self.month = int(now_date.month)
-        self.day = int(now_date.day)
+        self.year = int(self.now_date.year)
+        self.month = int(self.now_date.month)
+        self.day = int(self.now_date.day)
         self.key_week = self.week
-        self.special_month = [2, 4, 6, 9, 11]
-        
 
     # 曖昧な表現を正確な日程に変換                                      
-    def convert(self, sentences,diff_op = False):
-        diff = -1
-        if '来年' in sentences:
-            year = self.year+1
-            sentences = sentences.replace('来年', str(year))
-        if '今日' in sentences:
-            year = self.year
-            month = self.month
-            day = self.day
-            sentences = sentences.replace('今日', f'{year}年{month}月{day}日')
-        if '明日' in sentences:
-            diff = 1
-            year, month, day = self.day_set(diff)
-            sentences = sentences.replace('明日', f'{year}年{month}月{day}日')
-        if  '明後日' in sentences:
-            diff = 2
-            year,month,day = self.day_set(diff)
-            sentences = sentences.replace('明後日', f'{year}年{month}月{day}日')
-        if '明々後日' in sentences:
-            diff = 3
-            year,month,day = self.day_set(diff)
-            sentences=sentences.replace('明々後日', f'{year}年{month}月{day}日')
-        if '再来月' in sentences:
-            diff = 2
-            year,month = self.month_set(diff)
-            sentences=sentences.replace('再来月', f'{year}年{month}月')
-        if '来月' in sentences:
-            diff = 1
-            year,month = self.month_set(diff)
-            sentences = sentences.replace('来月', f'{year}年{month}月')
-        elif '今月' in sentences:
-            year,month = self.year,self.month
-            sentences = sentences.replace('今月', f'{year}年{month}月')
-        for w in self.week_list:
-            if w in sentences:
-                self.key_week = self.week_list.index(w)
-        if '再来週' in sentences:
-            diff = 14-(self.week-self.key_week)
-            year,month,day = self.day_set(diff)
-            sentences = sentences.replace('再来週','')
-        elif '来週' in sentences:
-            diff = 7-(self.week-self.key_week)
-            year,month,day = self.day_set(diff)
-            sentences = sentences.replace('来週','')
-        elif '今週' in sentences:
-            diff = self.key_week-self.week
-            year,month,day = self.day_set(diff)
-            sentences = sentences.replace('今週','')
-        if self.week_list[self.key_week]+'日' in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week]+'日', f'{year}年{month}月{self.day}日')
-        elif self.week_list[self.key_week] in sentences:
-            sentences = sentences.replace(self.week_list[self.key_week], f'{year}年{month}月{self.day}日')
-        if diff_op:
-            return sentences,diff
-        else:
-            return sentences
-                
-    # 日にちの変換
-    def day_set(self, diff_num):
+    def convert(self, message, diff_op = False):
         year = self.year
         month = self.month
         day = self.day
-        if month == 12 and day+diff_num > 31:
-            year = year+1
-            month = 1
-            day += diff_num-31
-        elif month == 2 and day+diff_num > 27:
-            if year % 4 == 0:
-                if year % 100 == 0 and self.day == 28:
-                    month = self.month+1
-                    day += diff_num-28
-                elif year % 400 == 0 and day == 29:
-                    month = self.month+1
-                    day += diff_num-29
-        elif month not in self.special_month and day + diff_num > 31:
-            month = month+1
-            day += diff_num-31
-        elif month in self.special_month and day + diff_num > 30:
-            month = month+1
-            day += diff_num-30
-        else:
-            day += diff_num
-        self.year = year
-        self.month = month
-        self.day = day
-        self.week += diff_num%7
-        return year, month, day
-
+        key_w = None
+        diff = -1
+        sentences = morpheme(message,nelogd=False)
+        for s,sentence in enumerate(sentences):
+            if sentence in self.keyword_year.keys():
+               year = self.year + self.keyword_year[sentence] 
+               diff = self.keyword_day[sentence]
+               message = message.replace(sentence, f'{year}年')
+            elif sentence in self.keyword_day.keys():
+                year, month, day = self.day_set(self.keyword_day[sentence])
+                message = message.replace(sentence, f'{year}年{month}月{day}日')
+                diff = self.keyword_day[sentence]
+            elif sentence in self.keyword_month.keys():
+                year, month = self.month_set(self.keyword_month[sentence])
+                message = message.replace(sentence, f'{year}年{month}月')
+            elif sentence in self.keyword_week.keys():  
+                key_w = sentence
+            elif sentence in self.week_list:
+                self.key_week = self.week_list.index(sentence)
+            elif sentence[:-1] in self.week_list:
+                self.key_week = self.week_list.index(sentence[:-1])
+        if key_w != None:
+            diff = self.keyword_week[key_w]-(self.week-self.key_week)
+            year, month, day = self.day_set(diff)
+            if self.week_list[self.key_week]+'日' in message:
+                message = message.replace(key_w,'')
+                message = message.replace(self.week_list[self.key_week]+'日', f'{year}年{month}月{day}日')
+            elif self.week_list[self.key_week] in message:
+                message = message.replace(key_w,'')
+                message = message.replace(self.week_list[self.key_week], f'{year}年{month}月{day}日')
+            else:
+                message = message.replace(key_w, f'{year}年{month}月{self.day}日')
+        if diff_op:
+            return message, diff
+        return message
+        
+    # 日にちの変換
+    def day_set(self,diff_num):
+        update = self.now_date + timedelta(days = diff_num)
+        return update.year,update.month,update.day
+   
     # 月の変換
     def month_set(self, diff_num):
         year = self.year
         month = self.month
-        if month+diff_num > 13:
+        if month + diff_num > 12:
             year += 1
             month = 1
         else:
@@ -115,3 +75,10 @@ class Date_Update:
         self.month = month
         return year, month
 
+if __name__ == '__main__':
+    dup = Date_Update()
+    s = input()
+    a,diff = dup.convert(s,diff_op=True)
+    print(a)
+    print(diff)
+    

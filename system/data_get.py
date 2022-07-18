@@ -1,10 +1,12 @@
 from copy import copy
-from moodle.config import *
+from system.config import *
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 import unicodedata
+
+#moodleサイトのスクレイピング
 def moodel_data():
     html1 = 0
     html2 = 0
@@ -28,6 +30,7 @@ def moodel_data():
     driver.close()
     return html1,html2
 
+#スクレイピングの解析
 def extract_html(html):
     plan_data = []
     date = []
