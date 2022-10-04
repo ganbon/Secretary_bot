@@ -29,13 +29,14 @@ class Discrimination(ScheduleTable):
         self.minute = int(self.now_date.minute)   
         
     #予定の内容抽出
-    def content_extract(self, input_dict):
+    def content_extract(self, input_dict,sentences):
         output_list = []
-        sentences = list(input_dict.keys())
         speech_list = list(input_dict.values())
         ban_word = ['覚え','記憶']
         pass_word = ['予定','こと']
         for i,sentence in enumerate(sentences):
+            now_speech =input_dict[sentence]['speech'] 
+            next_speech = input_dict[sentences[i+1]]['speech']
             if sentence in ban_word:
                 break
             elif sentence in pass_word:
@@ -44,9 +45,9 @@ class Discrimination(ScheduleTable):
                 continue
             elif sentences[i-1].isdecimal() and sentence in self.date_key:
                 continue
-            elif output_list != [] and speech_list[i-1]['speech'] == speech_list[i+1]['speech'] == '名詞' and sentences[i+1] not in pass_word:
+            elif output_list != [] and now_speech == next_speech == '名詞' and sentences[i+1] not in pass_word:
                 output_list.append(sentence)
-            elif speech_list[i]['speech'] == '名詞':
+            elif now_speech == '名詞':
                 output_list.append(sentence)
             else:
                 continue
@@ -68,12 +69,12 @@ class Discrimination(ScheduleTable):
     def schedule_register(self, message):
         schedule_list = self.schedule_date.values.tolist()
         message = self.date_update.convert(message)
-        input_dict = morpheme(message,kind = True)
+        input_dict,sentence = morpheme(message,kind = True)
         plan_contents = self.content_extract(input_dict)
-        plan_day = self.date_specify('日',input_dict)
-        plan_month = self.date_specify('月',input_dict)
-        plan_hour = self.date_specify('時',input_dict)
-        plan_minute = self.date_specify('分',input_dict)
+        plan_day = self.date_specify('日',sentence)
+        plan_month = self.date_specify('月',sentence)
+        plan_hour = self.date_specify('時',sentence)
+        plan_minute = self.date_specify('分',sentence)
         if plan_month == []:
             plan_month = self.month
         if plan_hour == []:
